@@ -1,0 +1,29 @@
+@base = http://127.0.0.1:8000
+
+### 201: alta de editorial (usar una base de prueba dedicada)
+# @name editorial
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{"nombre": "Editorial Sur", "pais": "Argentina"}
+
+### 409: nombre duplicado, sin detalles internos de la base
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{"nombre": "Editorial Sur"}
+
+### 200: solo se modifica el nombre, se conserva el país
+PATCH {{base}}/editoriales/{{editorial.response.body.$.id}}
+Content-Type: application/json
+
+{"nombre": "Editorial Norte"}
+
+### 422: identificador no entero
+GET {{base}}/editoriales/abc
+
+### 422: paginación fuera de rango
+GET {{base}}/libros/?limit=101
+
+### 200: el texto se trata como dato, no como código SQL
+GET {{base}}/libros/?titulo=%27%20OR%20%271%27%3D%271

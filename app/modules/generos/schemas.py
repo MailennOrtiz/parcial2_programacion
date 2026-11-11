@@ -1,1 +1,11 @@
-# DTO del módulo generos (se implementan en ejercicios posteriores).
+# DTO del mï¿½dulo generos (se implementan en ejercicios posteriores).
+"""Contratos de gÃ©neros."""
+from sqlmodel import Field
+from app.core.schemas import Entrada, Lectura
+
+class GeneroCreate(Entrada):
+    nombre: str = Field(min_length=1, max_length=200)
+
+class GeneroRead(Lectura):
+    id: int
+    nombre: str
