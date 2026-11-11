@@ -1,0 +1,39 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 18 — LA VENTANA ENTRE PREGUNTAR Y ESCRIBIR
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+#
+# Antes de correr: abrí productos/service.py → crear_producto. No hay ningún
+# SELECT previo que pregunte "¿ya existe?": se intenta escribir, y decide la base.
+
+### 1) Un producto nuevo
+# Esperado: 201
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Medialuna",
+  "precio": 800
+}
+
+### 2) El mismo nombre otra vez (diapositiva 18)
+# Qué decir: lo rechaza el índice único de producto.nombre, no el código.
+# Esperado: 409 · mensaje "Ya existe un producto llamado 'Medialuna'."
+# La respuesta trae además mensaje_de_la_base: ahí aparecen ix_producto_nombre y la tabla.
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Medialuna",
+  "precio": 850
+}
+
+# ── Diapositiva 18, en vivo: dos (u ocho) peticiones a la vez ─────────────────
+# Con el servidor corriendo, en otra terminal:
+#     python scripts/demo_unicidad.py
+# Esperado: de 8 altas simultáneas con el mismo nombre, UNA recibe 201 y siete
+# 409. Ninguna preguntó antes: resolvió la base.

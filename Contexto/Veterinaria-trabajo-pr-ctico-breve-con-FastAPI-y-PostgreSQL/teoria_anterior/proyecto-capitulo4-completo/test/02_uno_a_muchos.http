@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 4 — UNO A MUCHOS: LA CLAVE VA DEL LADO «MUCHOS»
+# "La ficha de Marta no lleva los vales colgados"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) La fila de Marta
+# Qué decir: en el diagrama de clases el usuario «tiene» una lista de pedidos.
+# En la tabla no hay dónde ponerla: una columna guarda un valor, no una lista.
+# (Las columnas que la tabla tiene de verdad: 00_mirar_la_base.sql, diapositiva 4.)
+# Esperado: {"id": 7, "nombre": "Marta"} — nada más
+GET {{baseUrl}}/usuarios/7
+
+### 2) "Los pedidos de Marta": no se leen de su fila, se BUSCAN
+# Qué decir: mirá la consola de uvicorn → SELECT ... FROM pedido WHERE usuario_id = 7.
+# La tabla usuario ni aparece en la consulta.
+# Esperado: 101 y 102
+GET {{baseUrl}}/usuarios/7/pedidos
+
+### 3) Marta hace un pedido más
+# Esperado: 201 con id 104: el número lo asigna la base (el próximo después de
+# los datos iniciales). La vuelta trae, además del usuario_id guardado, el
+# usuario armado y la lista de líneas (vacía): así responde POST /pedidos/
+# (ver archivo 13).
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 7
+}
+
+### 4) Los pedidos de Marta ahora
+# Esperado: 101, 102 y 104
+GET {{baseUrl}}/usuarios/7/pedidos
+
+### 5) La fila de Marta, otra vez
+# Qué decir: tiene un pedido más y su fila no cambió ni una letra.
+# Esperado: {"id": 7, "nombre": "Marta"} — igual que antes
+GET {{baseUrl}}/usuarios/7
+
+### 6) Los pedidos de Rubén (para ver que cada uno sabe de quién es)
+# Esperado: 103
+GET {{baseUrl}}/usuarios/8/pedidos

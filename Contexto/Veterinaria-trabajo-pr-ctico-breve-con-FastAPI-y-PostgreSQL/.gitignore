@@ -1,0 +1,21 @@
+# Configuración local y secretos (también en el proyecto de referencia).
+.env
+.env.*
+!.env.example
+
+# Entornos virtuales y archivos generados por Python.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Herramientas de pruebas y análisis.
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Configuración local del editor.
+.idea/
+.vscode/

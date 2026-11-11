@@ -1,0 +1,46 @@
+# Preparación: ejecutar python reiniciar.py antes de este archivo.
+@baseUrl = http://localhost:8000
+
+### 200. Envoltorio: total=3, page=1, size=20, pages=1.
+GET {{baseUrl}}/mascotas/
+
+### 200. Segunda página: solo Luna; total=3, pages=2.
+GET {{baseUrl}}/mascotas/?page=2&size=2
+
+### 422. Página posterior a la última.
+GET {{baseUrl}}/mascotas/?page=3&size=2
+
+### 422. size no puede superar 100.
+GET {{baseUrl}}/mascotas/?size=101
+
+### 422. page debe ser mayor o igual a 1.
+GET {{baseUrl}}/mascotas/?page=0
+
+### 200. Toby con su dueño precargado (Ana).
+GET {{baseUrl}}/mascotas/1
+
+### 404. Mascota inexistente.
+GET {{baseUrl}}/mascotas/999999
+
+### C-04 (mascota): 409. La FK rechaza el dueño inexistente.
+POST {{baseUrl}}/mascotas/
+Content-Type: application/json
+
+{
+  "nombre": "Pepe",
+  "especie": "loro",
+  "duenio_id": 999999
+}
+
+### 200. Sigue habiendo tres mascotas; el alta rechazada no dejó datos.
+GET {{baseUrl}}/mascotas/
+
+### 201. Alta válida con el id de un dueño existente, no sus datos anidados.
+POST {{baseUrl}}/mascotas/
+Content-Type: application/json
+
+{
+  "nombre": "Pepe",
+  "especie": "loro",
+  "duenio_id": 2
+}

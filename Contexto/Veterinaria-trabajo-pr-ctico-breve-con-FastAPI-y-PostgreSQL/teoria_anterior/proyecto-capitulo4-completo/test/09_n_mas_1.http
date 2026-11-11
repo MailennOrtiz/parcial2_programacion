@@ -1,0 +1,40 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 13 — CIEN PEDIDOS, CIENTO UN VIAJES (EL N+1)
+# "El mandado de a uno"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+#
+# El endpoint de este archivo es la VERSIÓN INCORRECTA, a propósito.
+
+### 1) Todos los pedidos con sus líneas, de a un viaje por pedido
+# Qué decir: abrí pedidos/service.py → listar_con_detalles_n_mas_1: un for con
+# una consulta adentro. Es lo que hace en silencio un backend sincrónico cuando
+# se escribe pedido.detalles dentro de un for sin haberlo precargado.
+# Mirá la consola: un SELECT sobre pedido y después un SELECT sobre
+# detalle_pedido POR CADA pedido.
+# consultas_emitidas = 1 + 3 = 4. Con 100 pedidos serían 1 + 100 = 101:
+# «ciento una consultas donde debía emitir dos».
+# Esperado: 200 · consultas_emitidas 4 · los pedidos 101, 102 y 103 con sus líneas
+GET {{baseUrl}}/pedidos/n-mas-1
+
+### 2) Rubén hace un pedido más
+# Esperado: 201 con id 104, que lo asigna la base. La vuelta trae, además del
+# usuario_id guardado, el usuario armado y la lista de líneas (vacía): así
+# responde POST /pedidos/ (ver archivo 13).
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 8
+}
+
+### 3) El mismo listado, otra vez
+# Qué decir: un pedido más es un viaje más. El costo crece con la tabla, y el
+# código no cambió ni una letra. En un backend sincrónico esto funciona, es
+# lento y nadie se entera. En este proyecto, la diapositiva 15 (archivo 10).
+# Esperado: consultas_emitidas 5
+GET {{baseUrl}}/pedidos/n-mas-1

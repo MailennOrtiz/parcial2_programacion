@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:8000
+
+################################################################################
+# DIAPOSITIVA 15 — ACÁ OLVIDAR LA PRECARGA EXPLOTA, Y ESO ES UN FAVOR
+# "La canilla que gotea y la que explota"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+#
+# Los dos endpoints de este archivo son la VERSIÓN INCORRECTA, a propósito.
+# La excepción se atrapa en el service sólo para devolverla con un mensaje
+# claro; en un proyecto real no se atrapa: se arregla (archivo 11).
+
+### 1) El pedido 101, tocando sus líneas sin haberlas precargado
+# Qué decir: abrí pedidos/service.py → obtener_sin_precarga. session.get trae
+# el pedido; después se toca pedido.detalles. Mirá la consola: aparece el
+# SELECT ... FROM detalle_pedido que el ORM INTENTÓ hacer en ese momento. Es la
+# consulta escondida detrás de pedido.detalles, y no llegó a ejecutarse: en
+# asincrónico no puede salir fuera de un await.
+# Esperado: 500 · excepcion "sqlalchemy.exc.MissingGreenlet"
+#           · "greenlet_spawn has not been called; can't call await_only() here. ..."
+GET {{baseUrl}}/pedidos/101/sin-precarga
+
+### 2) Lo mismo con usuario.pedidos: la consulta de la diapositiva 12
+# Qué decir: esta es la respuesta a la pregunta del archivo 08. La consulta se
+# intenta ejecutar en el momento en que se toca usuario.pedidos, y acá eso
+# explota. Pasa en tu máquina, con tres registros de prueba, el día que lo
+# escribís: el mejor momento posible para enterarse.
+# Esperado: 500 · excepcion "sqlalchemy.exc.MissingGreenlet"
+GET {{baseUrl}}/usuarios/7/pedidos-sin-precarga
+
+# Dónde mirar cuando esto pasa (diapositiva 14): en el método que trajo el
+# objeto. Acá, session.get(...) sin options(selectinload(...)): le falta una línea.

@@ -1,0 +1,17 @@
+# No requiere reiniciar la base: laboratorio y live no acceden a PostgreSQL.
+@baseUrl = http://localhost:8000
+
+### 200. Tarda aproximadamente un segundo: { "vacuna": "rabia", "stock": 15 }.
+GET {{baseUrl}}/laboratorio/stock/rabia
+
+### 200. { "vacuna": "triple", "stock": 16 }.
+GET {{baseUrl}}/laboratorio/stock/triple
+
+### 200 inmediato, sin consultar la base.
+GET {{baseUrl}}/health/live
+
+### C-09: ejecutar tres consultas de stock SIMULTÁNEAS y consultar live durante ellas.
+# Las peticiones anteriores por separado NO demuestran concurrencia.
+# Con el servidor iniciado con un solo worker, ejecutar desde otra terminal:
+# .\.venv\Scripts\python.exe test/c09_concurrencia.py
+# Esperado: salud 200 antes de terminar las tres consultas; stock 200 para las tres.

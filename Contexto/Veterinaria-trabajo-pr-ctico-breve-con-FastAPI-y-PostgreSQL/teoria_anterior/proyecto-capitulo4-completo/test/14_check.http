@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 17 — UNA COMPROBACIÓN EN LA BASE NO LE PREGUNTA DE DÓNDE VIENE EL DATO
+# "El cartel en la balanza" · la puerta de la API (este archivo) y la base (14_check.sql)
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) Un precio en cero, por la API
+# Qué decir: lo frena el DTO (ProductoCreate, precio con gt=0) antes de llegar
+# a la base: en la consola no aparece ningún INSERT. Pero eso sólo protege la
+# puerta de la API. Lo que entra por otro lado lo cuenta 14_check.sql.
+# Esperado: 422
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Chicle",
+  "precio": 0
+}
+
+### 2) El mismo producto con un precio válido
+# Esperado: 201 con id 4
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Chicle",
+  "precio": 150
+}
+
+# Ahora corré 14_check.sql en pgAdmin o psql: el UPDATE que pone el precio en
+# -5 no pasa por la API, y la base lo rechaza igual.

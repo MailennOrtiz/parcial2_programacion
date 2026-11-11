@@ -1,0 +1,28 @@
+@baseUrl = http://localhost:8000
+
+################################################################################
+# DIAPOSITIVA 12 — usuario.pedidos PARECE UNA LISTA, PERO ES UNA CONSULTA
+# "La ficha que dice «ver depósito»"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) Marta, recién traída de la base
+# Qué decir: abrí usuarios/service.py → que_hay_en_memoria. session.get trae
+# sólo la fila de Marta: mirá la consola, un SELECT sobre usuario y nada sobre
+# pedido. La relación `pedidos` está declarada en el modelo, pero en memoria no
+# hay nada: el ORM sólo sabe dónde ir a buscarla. La ficha dice «ver depósito».
+# Esperado: consultas_emitidas 1 · atributos_cargados ["id", "nombre"]
+#           · atributos_sin_cargar ["pedidos", "perfil", "perfiles_sin_unicidad"]
+# (Las tres son relaciones declaradas en Usuario: ninguna está en memoria.)
+GET {{baseUrl}}/usuarios/7/que-hay-en-memoria
+
+### 2) La consulta que hay detrás de usuario.pedidos
+# Qué decir: para tener esa lista en la mano hace falta ESTA consulta:
+# SELECT ... FROM pedido WHERE usuario_id = 7 (es la de la
+# diapositiva 4). usuario.pedidos no es una lista guardada: es esta consulta,
+# esperando su turno.
+# Pregunta para el aula: si en el código se escribe usuario.pedidos, ¿cuándo se
+# ejecuta esta consulta? La respuesta, en el archivo 10.
+# Esperado: [{"id": 101, "usuario_id": 7}, {"id": 102, "usuario_id": 7}]
+GET {{baseUrl}}/usuarios/7/pedidos

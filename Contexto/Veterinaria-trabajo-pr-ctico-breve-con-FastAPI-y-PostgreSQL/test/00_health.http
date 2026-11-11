@@ -1,0 +1,8 @@
+@baseUrl = http://localhost:8000
+
+### Vida: 200 con { "estado": "vivo" }, incluso con PostgreSQL detenido.
+GET {{baseUrl}}/health/live
+
+### Disponibilidad: 200 con base_de_datos="disponible" si PostgreSQL responde.
+# Con PostgreSQL detenido o inaccesible: 503 con mensaje propio, sin credenciales.
+GET {{baseUrl}}/health/ready

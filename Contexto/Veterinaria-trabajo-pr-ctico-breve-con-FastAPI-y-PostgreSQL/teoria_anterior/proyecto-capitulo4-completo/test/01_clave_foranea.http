@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 4 — LA CLAVE FORÁNEA
+# "Cada pedido lleva anotado de quién es" (el número de socio en el vale)
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### Health DB
+GET {{baseUrl}}/health/db
+
+### 1) La tabla pedido, tal cual está guardada
+# Qué decir: usuario_id es un número y nada más. Es la clave de OTRA fila.
+# Esperado: 101 → 7, 102 → 7, 103 → 8
+GET {{baseUrl}}/pedidos/
+
+### 2) Con ese número se llega al dueño (JOIN con usuario)
+# Qué decir: el número sirve para ir a buscar la otra fila.
+# Esperado: 101 Marta, 102 Marta, 103 Rubén
+GET {{baseUrl}}/pedidos/con-usuario
+
+### 3) Un pedido nuevo a nombre del usuario 999, que NO existe
+# Qué decir: abrí pedidos/service.py → crear_pedido. No hay ningún "if" que
+# verifique al usuario. Lo rechaza la base. Leé mensaje_de_la_base en voz alta.
+# (En el DTO no viaja el id del pedido: el número lo asigna la base.)
+# Esperado: 409. En mensaje_de_la_base aparece pedido_usuario_id_fkey
+# (cómo está escrita esa restricción en la base: 00_mirar_la_base.sql)
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 999
+}
+
+### 4) El mismo pedido, ahora a nombre del usuario 8 (Rubén, que existe)
+# Esperado: 201 con id 105. La base asigna el número, y el 104 ya lo gastó el
+# intento rechazado del paso 3: un contador de la base no devuelve números,
+# aunque la fila no haya entrado.
+# La vuelta trae, además del usuario_id guardado, el usuario armado y la lista
+# de líneas (vacía): así responde POST /pedidos/ (ver archivo 13).
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 8
+}
+
+### 5) La tabla pedido después
+# Esperado: 101, 102, 103 y 105 (de Rubén). El pedido a nombre del 999 nunca entró.
+GET {{baseUrl}}/pedidos/

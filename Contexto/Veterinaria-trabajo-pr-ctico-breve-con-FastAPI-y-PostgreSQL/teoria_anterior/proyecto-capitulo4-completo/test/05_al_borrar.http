@@ -1,0 +1,77 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 7 — AGREGACIÓN Y COMPOSICIÓN: QUÉ PASA AL BORRAR
+# "La góndola y el ticket" · cascada, restringir o anular
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+#
+# Las dos relaciones llevan clave foránea; la diferencia está en el ON DELETE.
+# Para verlo escrito en la base: 00_mirar_la_base.sql, diapositiva 7.
+
+################################################################################
+# 1 · CASCADA — composición: Pedido y sus líneas
+################################################################################
+
+### 1) Antes: las líneas de todos los pedidos
+# Esperado: 101 Empanada x3, 101 Gaseosa x1, 102 Alfajor x6
+GET {{baseUrl}}/pedidos/detalles
+
+### 2) Se borra el pedido 101 (sólo el pedido)
+# Qué decir: mirá la consola de uvicorn → un único DELETE FROM pedido.
+# Nadie emite un DELETE sobre detalle_pedido.
+# Esperado: 204
+DELETE {{baseUrl}}/pedidos/101
+
+### 3) Después
+# Qué decir: las dos líneas del 101 se fueron con él. Se rompió el ticket.
+# Esperado: queda sólo 102 Alfajor x6
+GET {{baseUrl}}/pedidos/detalles
+
+################################################################################
+# 2 · RESTRINGIR — agregación: Categoría y Producto
+################################################################################
+
+### 4) Los productos de la categoría Comidas (id 1)
+# Esperado: Empanada
+GET {{baseUrl}}/categorias/1/productos
+
+### 5) Se intenta borrar la categoría Comidas, que todavía tiene a la Empanada
+# Qué decir: no te dejo sacar la góndola si todavía hay latas.
+# Esperado: 409. En mensaje_de_la_base aparece producto_categoria_id_fkey
+DELETE {{baseUrl}}/categorias/1
+
+### 6) La categoría sigue estando
+# Esperado: Comidas, Bebidas, Golosinas
+GET {{baseUrl}}/categorias/
+
+################################################################################
+# 3 · ANULAR — la misma clave foránea, con otra respuesta
+################################################################################
+
+# ANTES DE SEGUIR: correr test/05_al_borrar_anular.sql en pgAdmin o psql.
+# Ese archivo cambia la decisión de la clave foránea: de RESTRICT a SET NULL.
+# Qué decir: es la MISMA clave foránea con una palabra distinta. En el modelo
+# sería ondelete="SET NULL" en Producto.categoria_id (productos/models.py).
+
+### 7) Antes: los productos con su categoría
+# Esperado: Empanada → 1, Gaseosa → 2, Alfajor → 3
+GET {{baseUrl}}/productos/
+
+### 8) Se borra la categoría Comidas, ahora sí
+# Qué decir: es la misma petición del paso 5. El código no cambió: cambió la base.
+# Esperado: 204
+DELETE {{baseUrl}}/categorias/1
+
+### 9) Después
+# Qué decir: la Empanada sigue existiendo, sin categoría: la lata sin góndola.
+# Esperado: Empanada → categoria_id null
+GET {{baseUrl}}/productos/
+
+### 10) Las categorías que quedan
+# Esperado: Bebidas y Golosinas
+GET {{baseUrl}}/categorias/
+
+# Para volver a la regla RESTRICT y a los datos iniciales: python reiniciar.py

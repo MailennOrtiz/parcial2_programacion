@@ -1,0 +1,75 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 6 — MUCHOS A MUCHOS: LA TABLA DEL MEDIO TIENE ALGO PARA DECIR
+# "La receta"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) Los productos, tal cual están guardados
+# Qué decir: ninguna de las dos tablas tiene dónde anotar a la otra.
+# Esperado: cada producto con id, nombre, precio y categoria_id (nada de ingredientes)
+GET {{baseUrl}}/productos/
+
+### 1b) Los ingredientes
+# Esperado: cada ingrediente con id y nombre (nada de productos)
+GET {{baseUrl}}/ingredientes/
+
+### 2) La tabla intermedia, tal cual está guardada
+# Qué decir: dos claves foráneas, una hacia cada lado, y un dato propio: cantidad.
+# Esperado: (1, 1, 50) y (1, 2, 120)
+# (Sus restricciones en la base: 00_mirar_la_base.sql, diapositiva 6.)
+GET {{baseUrl}}/productos/recetas
+
+### 3) La receta de la empanada, con nombres
+# Qué decir: los 50 g no son de la empanada ni de la cebolla: son de la receta.
+# Esperado: Cebolla 50, Carne 120
+GET {{baseUrl}}/productos/1/ingredientes
+
+### 4) Un producto nuevo: la Tarta (en Comidas)
+# (La Tarta es un agregado de este proyecto: hace falta un segundo producto
+#  para mostrar "muchos" de los dos lados.)
+# Esperado: 201 con id 4, que lo asigna la base (el próximo después de los tres
+# productos iniciales). La vuelta trae la categoría armada: Comidas; ver archivo 13.
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Tarta",
+  "precio": 4500,
+  "categoria_id": 1
+}
+
+### 5) La Tarta también lleva cebolla: 80 g
+# Qué decir: se agrega UNA fila en la tabla del medio. Ni producto ni ingrediente se tocan.
+# Esperado: 201
+POST {{baseUrl}}/productos/4/ingredientes
+Content-Type: {{json}}
+
+{
+  "ingrediente_id": 1,
+  "cantidad": 80
+}
+
+### 6) El mismo muchos a muchos, leído desde el otro lado: ¿en qué va la cebolla?
+# Qué decir: ahora hay "muchos" de los dos lados, y es la misma tabla intermedia.
+# Esperado: Empanada 50 y Tarta 80
+GET {{baseUrl}}/ingredientes/1/productos
+
+### 7) Repetir la cebolla en la empanada
+# Qué decir: la clave primaria compuesta impide que el mismo ingrediente
+# figure dos veces en la misma receta.
+# Esperado: 409. En mensaje_de_la_base aparece producto_ingrediente_pkey
+POST {{baseUrl}}/productos/1/ingredientes
+Content-Type: {{json}}
+
+{
+  "ingrediente_id": 1,
+  "cantidad": 10
+}
+
+### 8) La tabla intermedia al final
+# Esperado: tres filas — (1, 1, 50), (1, 2, 120), (4, 1, 80)
+GET {{baseUrl}}/productos/recetas

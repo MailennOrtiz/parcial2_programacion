@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Capítulo 4 — persistencia, en vivo</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --navy: #1F4E78;
+    --navy-dark: #14202A;
+    --ink: #1F2D3D;
+    --muted: #5A6470;
+    --blue-border: #1F6FB5;
+    --blue-fill: #EEF4FB;
+    --orange-border: #CF7A1B;
+    --orange-fill: #FDF3E6;
+    --line: #c6cdd5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Calibri, "Segoe UI", Arial, sans-serif;
+    color: var(--ink);
+    background: white;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    line-height: 1.45;
+  }
+  h1 { color: var(--navy-dark); font-size: 1.9rem; margin-bottom: 0.2rem; }
+  .subtitulo { color: var(--muted); font-style: italic; margin-top: 0; }
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .tarjeta { border: 2px solid var(--blue-border); background: var(--blue-fill); border-radius: 10px; padding: 1rem 1.1rem; }
+  .tarjeta.naranja { border-color: var(--orange-border); background: var(--orange-fill); }
+  .tarjeta h2 { color: var(--navy); font-size: 1.15rem; margin: 0 0 0.3rem; }
+  .tarjeta p { margin: 0.3rem 0 0.7rem; }
+  .tarjeta a { color: var(--navy); font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { border: 1px solid var(--line); padding: 0.35rem 0.6rem; text-align: left; vertical-align: top; }
+  th { background: #eef1f4; }
+  code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<h1>Capítulo 4 — persistencia: SQLModel, PostgreSQL y el modelo de datos</h1>
+<p class="subtitulo">El proyecto que acompaña a la presentación del capítulo, diapositiva por diapositiva. Los botones de cada página llaman a esta misma API.</p>
+
+<div class="tarjetas">
+  <div class="tarjeta">
+    <h2>Partes 1 y 2 · las relaciones</h2>
+    <p>Cómo se guardan (clave foránea, uno a uno, muchos a muchos, qué pasa al borrar) y cómo se leen (precarga, N+1, <code>MissingGreenlet</code>). Diapositivas 2 a 15.</p>
+    <a href="/static/relaciones.html">Abrir la página de relaciones</a>
+  </div>
+  <div class="tarjeta naranja">
+    <h2>Parte 3 · el esquema en la práctica</h2>
+    <p>El CHECK y la unicidad en la base, y las migraciones. Diapositivas 16 a 19.</p>
+    <a href="/static/buenas-practicas.html">Abrir la página de la Parte 3</a>
+  </div>
+  <div class="tarjeta">
+    <h2>Toda la API</h2>
+    <p>Cada endpoint con sus esquemas, para probarlo a mano.</p>
+    <a href="/docs">Abrir /docs</a>
+  </div>
+</div>
+
+<h2 style="color: var(--navy)">Dónde está cada diapositiva</h2>
+<table>
+  <tr><th>Diapositivas</th><th>Qué se muestra</th><th>Archivo de <code>test/</code></th></tr>
+  <tr><td>4</td><td>La clave foránea, del lado «muchos»</td><td><code>01_clave_foranea.http</code> y <code>02_uno_a_muchos.http</code></td></tr>
+  <tr><td>5</td><td>Uno a uno: clave foránea más unicidad</td><td><code>03_uno_a_uno.http</code></td></tr>
+  <tr><td>6</td><td>Muchos a muchos: la receta</td><td><code>04_muchos_a_muchos.http</code></td></tr>
+  <tr><td>7</td><td>Agregación y composición: qué pasa al borrar</td><td><code>05_al_borrar.http</code> y <code>05_al_borrar_anular.sql</code></td></tr>
+  <tr><td>8</td><td>El índice de la clave foránea</td><td><code>06_indice_clave_foranea.sql</code></td></tr>
+  <tr><td>4 a 7</td><td>Lo que la base tiene guardado</td><td><code>00_mirar_la_base.sql</code></td></tr>
+  <tr><td>11</td><td>Las dos puntas del hilo</td><td><code>07_declarar_la_relacion.http</code></td></tr>
+  <tr><td>12</td><td>Declarar no es cargar</td><td><code>08_declarar_no_es_cargar.http</code></td></tr>
+  <tr><td>13</td><td>El N+1</td><td><code>09_n_mas_1.http</code></td></tr>
+  <tr><td>14</td><td>La precarga con <code>selectinload</code> (y <code>joinedload</code>)</td><td><code>11_selectinload.http</code> y <code>12_selectinload_o_joinedload.http</code></td></tr>
+  <tr><td>15</td><td>Sin precarga, explota</td><td><code>10_sin_precarga_explota.http</code></td></tr>
+  <tr><td>4, 7 y 14</td><td>Qué viaja en el DTO al crear</td><td><code>13_composicion_agregacion_asociacion.http</code></td></tr>
+  <tr><td>17</td><td>El CHECK</td><td><code>14_check.http</code> y <code>14_check.sql</code></td></tr>
+  <tr><td>18</td><td>La unicidad</td><td><code>15_unicidad.http</code> y <code>scripts/demo_unicidad.py</code></td></tr>
+  <tr><td>19</td><td>Las migraciones</td><td>Sin demo: este proyecto no usa Alembic</td></tr>
+</table>
+
+<p>Para volver a los datos de las diapositivas, en cualquier momento: <code>python reiniciar.py</code>.</p>
+
+</body>
+</html>

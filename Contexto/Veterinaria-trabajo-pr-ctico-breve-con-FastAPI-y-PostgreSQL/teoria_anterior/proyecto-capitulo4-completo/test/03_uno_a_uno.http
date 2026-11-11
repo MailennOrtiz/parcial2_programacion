@@ -1,0 +1,54 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 5 — UNO A UNO: CLAVE FORÁNEA MÁS RESTRICCIÓN DE UNICIDAD
+# "Un socio, un carnet"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) El perfil que Marta ya tiene
+# Qué decir: antes de correr, abrí usuarios/models.py y mostrá Perfil y
+# PerfilSinUnicidad una debajo de la otra: difieren en una palabra (unique=True).
+# (Cómo quedó eso en la base: 00_mirar_la_base.sql, diapositiva 5.)
+# Esperado: uno solo ("Martita")
+GET {{baseUrl}}/usuarios/7/perfil
+
+### 2) Un SEGUNDO perfil para Marta, en la tabla con unicidad
+# Qué decir: el club no puede emitir dos carnets al mismo socio. Lo frena la base.
+# Esperado: 409. En mensaje_de_la_base aparece perfil_usuario_id_key
+POST {{baseUrl}}/usuarios/7/perfil
+Content-Type: {{json}}
+
+{
+  "apodo": "La Marta"
+}
+
+### 3) Rubén todavía no tiene perfil: el primero sí entra
+# Esperado: 201
+POST {{baseUrl}}/usuarios/8/perfil
+Content-Type: {{json}}
+
+{
+  "apodo": "Rubencito"
+}
+
+### 4) El MISMO segundo perfil de Marta, en la tabla SIN unicidad
+# Qué decir: es el mismo INSERT. Pasa sin quejas.
+# Esperado: 201
+POST {{baseUrl}}/usuarios/7/perfil-sin-unicidad
+Content-Type: {{json}}
+
+{
+  "apodo": "La Marta"
+}
+
+### 5) Los perfiles de Marta en la tabla sin unicidad
+# Qué decir: ya no es uno a uno. Era uno a muchos con un solo elemento por casualidad.
+# Esperado: DOS perfiles
+GET {{baseUrl}}/usuarios/7/perfil-sin-unicidad
+
+### 6) Los perfiles de Marta en la tabla con unicidad
+# Esperado: sigue habiendo uno solo
+GET {{baseUrl}}/usuarios/7/perfil

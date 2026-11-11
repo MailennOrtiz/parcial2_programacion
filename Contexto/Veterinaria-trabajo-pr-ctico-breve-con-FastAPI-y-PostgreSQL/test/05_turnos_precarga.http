@@ -1,0 +1,35 @@
+# C-07. Preparación: ejecutar python reiniciar.py antes de este archivo.
+# El motor ya usa echo=True. Ejecutar las altas primero y luego cada GET por separado.
+# Para la evidencia, copiar de la consola las dos consultas SELECT de cada GET,
+# sin incluir las consultas de las altas. BEGIN/ROLLBACK no son consultas SELECT.
+@baseUrl = http://localhost:8000
+
+### 201. Reserva con una práctica, total 15000.00.
+# @name turnoUnaPractica
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-13T10:30:00-03:00",
+  "motivo": "C-07 una práctica",
+  "practicas": [{ "practica_id": 1 }]
+}
+
+### 201. Reserva con tres prácticas, total 35000.00.
+# @name turnoTresPracticas
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-13T11:30:00-03:00",
+  "motivo": "C-07 tres prácticas",
+  "practicas": [{ "practica_id": 1 }, { "practica_id": 2 }, { "practica_id": 3 }]
+}
+
+### C-07 A: 200. Dos SELECT: turno con mascota; colección con práctica del catálogo.
+GET {{baseUrl}}/turnos/2
+
+### C-07 B: 200. Los mismos dos SELECT aunque haya tres prácticas.
+GET {{baseUrl}}/turnos/3

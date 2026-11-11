@@ -1,0 +1,38 @@
+@baseUrl = http://localhost:8000
+
+################################################################################
+# DIAPOSITIVA 14 — DOS LÍNEAS DE selectinload Y LOS DATOS YA ESTÁN
+# EN MEMORIA · Y DÓNDE SE DECLARAN
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) El pedido 101 con su usuario y sus líneas, ya en memoria
+# Qué decir: abrí pedidos/service.py → obtener_con_detalles: es el código de la
+# diapositiva 14. Las dos líneas de selectinload DECLARAN qué relaciones va a
+# necesitar la respuesta. Mirá la consola: tres consultas, el pedido, sus líneas
+# (WHERE pedido_id IN (101)) y su usuario (WHERE id IN (7)). Cada selectinload
+# es una consulta más.
+# Esperado: 200 · consultas_emitidas 3 · pedido 101 con usuario Marta y 2 líneas
+GET {{baseUrl}}/pedidos/101/con-detalles
+
+### 2) El listado de la diapositiva 14: los tres pedidos con sus líneas
+# Qué decir: el mismo resultado que el archivo 09, con 2 consultas en vez de 4.
+# La segunda trae TODAS las líneas de una sola vez: WHERE pedido_id IN (101,
+# 102, 103). Con 100 pedidos seguirían siendo 2.
+# Esperado: consultas_emitidas 2
+GET {{baseUrl}}/pedidos/con-detalles-selectinload
+
+### 3) usuario.pedidos, precargado
+# Qué decir: la consulta de la diapositiva 12, emitida ahora a tiempo, dentro
+# del await: SELECT ... FROM pedido WHERE usuario_id IN (7).
+# Esperado: consultas_emitidas 2 · Marta con los pedidos 101 y 102
+GET {{baseUrl}}/usuarios/7/con-pedidos
+
+# DIAPOSITIVA 14 — ¿dónde está declarada la precarga?
+# En el método que TRAE los datos: obtener_con_detalles y obtener_con_pedidos.
+# Ni en el router ni en el esquema de la respuesta. En el TPI ese lugar es el
+# REPOSITORIO (por eso en la diapositiva dice self.session): es el único que
+# sabe cómo se traen los datos. Este proyecto no tiene capa de repositorio, así
+# que la precarga vive en el service, que es quien habla con la base.
+# Comparalo con obtener_sin_precarga (archivo 10): la diferencia es una línea.

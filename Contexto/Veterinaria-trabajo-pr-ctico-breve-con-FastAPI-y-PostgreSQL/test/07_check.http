@@ -1,0 +1,13 @@
+# C-08 exige una escritura SQL directa, no solo validación de entrada.
+# Ejecutar test/07_check.sql por bloques en pgAdmin y comprobar SQLSTATE 23514.
+# La petición siguiente es una comprobación complementaria del DTO (422).
+@baseUrl = http://localhost:8000
+
+### 422. El DTO impide precio cero. Esto NO reemplaza la prueba SQL de C-08.
+POST {{baseUrl}}/practicas/
+Content-Type: application/json
+
+{
+  "nombre": "C-08 precio inválido",
+  "precio": "0.00"
+}

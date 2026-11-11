@@ -1,0 +1,87 @@
+# Preparación: ejecutar python reiniciar.py antes de este archivo.
+# Los rechazos pueden consumir ids en PostgreSQL: no asumir ids consecutivos.
+@baseUrl = http://localhost:8000
+
+### 200. Turno inicial de Toby: Consulta y Vacuna antirrábica, total 27000.00.
+GET {{baseUrl}}/turnos/1
+
+### 422. RN-05: la lista de prácticas no puede estar vacía.
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "Lista vacía",
+  "practicas": []
+}
+
+### 422. El precio lo decide el servidor, no el cliente.
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "Precio enviado por cliente",
+  "practicas": [{ "practica_id": 1, "precio_unitario": "1.00" }]
+}
+
+### C-04 (turno): 409. No se guarda el turno ni la práctica válida de la lista.
+# Verificar también con test/04_turnos_verificar.sql.
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "C-04 práctica inexistente",
+  "practicas": [{ "practica_id": 1 }, { "practica_id": 999999 }]
+}
+
+### 409. La mascota inexistente la rechaza la FK. No se guarda nada.
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 999999,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "Mascota inexistente",
+  "practicas": [{ "practica_id": 1 }]
+}
+
+### 409. RN-07: la PK compuesta rechaza la práctica repetida; rollback completo.
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "Práctica repetida",
+  "practicas": [{ "practica_id": 1 }, { "practica_id": 3 }, { "practica_id": 1 }]
+}
+
+### C-06: 201. Precios 15000.00 y 12000.00, total 27000.00; mascota anidada.
+# @name turnoValido
+POST {{baseUrl}}/turnos/
+Content-Type: application/json
+
+{
+  "mascota_id": 1,
+  "fecha": "2026-11-12T10:30:00-03:00",
+  "motivo": "C-06 control anual",
+  "practicas": [{ "practica_id": 1 }, { "practica_id": 3 }]
+}
+
+### 200. Mismos precios y total persistidos.
+GET {{baseUrl}}/turnos/{{turnoValido.response.body.$.id}}
+
+### C-05 (turno): 204 sin cuerpo. La base borra sus filas de turno_practica.
+# En consola debe verse DELETE FROM turno, no DELETE FROM turno_practica.
+DELETE {{baseUrl}}/turnos/{{turnoValido.response.body.$.id}}
+
+### 404. El turno borrado ya no existe.
+GET {{baseUrl}}/turnos/{{turnoValido.response.body.$.id}}
+
+### 404. No puede borrarse dos veces.
+DELETE {{baseUrl}}/turnos/{{turnoValido.response.body.$.id}}

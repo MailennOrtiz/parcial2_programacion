@@ -1,0 +1,12 @@
+# FastAPI: el marco de trabajo web. "standard" trae uvicorn y "fastapi dev".
+fastapi[standard]>=0.111
+# SQLModel: un mismo modelo que es a la vez Pydantic y tabla.
+sqlmodel>=0.0.24
+# El ORM asincrónico (el extra "asyncio" instala greenlet).
+sqlalchemy[asyncio]>=2.0
+# El controlador asincrónico de PostgreSQL.
+asyncpg>=0.30
+# Lee el archivo .env (diapositiva 31: la contraseña no va en el código).
+python-dotenv>=1.0
+# Cliente HTTP asincrónico: lo usan los scripts de demo del pool y de la unicidad.
+httpx>=0.27

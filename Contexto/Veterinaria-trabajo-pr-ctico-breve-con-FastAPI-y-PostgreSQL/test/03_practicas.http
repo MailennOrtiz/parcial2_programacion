@@ -1,0 +1,44 @@
+# Preparación: ejecutar python reiniciar.py antes de este archivo.
+@baseUrl = http://localhost:8000
+
+### 200. Catálogo inicial de cuatro prácticas, con precios decimales como cadenas.
+GET {{baseUrl}}/practicas/
+
+### C-02 (práctica): 409 con mensaje propio por nombre repetido.
+POST {{baseUrl}}/practicas/
+Content-Type: application/json
+
+{
+  "nombre": "Consulta",
+  "precio": "16000.00"
+}
+
+### 422. El DTO rechaza precio cero antes de ejecutar el handler.
+POST {{baseUrl}}/practicas/
+Content-Type: application/json
+
+{
+  "nombre": "Precio inválido",
+  "precio": "0.00"
+}
+
+### 422. No se admiten más de dos decimales.
+POST {{baseUrl}}/practicas/
+Content-Type: application/json
+
+{
+  "nombre": "Demasiados decimales",
+  "precio": "10.001"
+}
+
+### 201. Alta válida; el servidor asigna el id.
+POST {{baseUrl}}/practicas/
+Content-Type: application/json
+
+{
+  "nombre": "Ecografía",
+  "precio": "25000.00"
+}
+
+### 200. Catálogo de cinco prácticas.
+GET {{baseUrl}}/practicas/

@@ -1,0 +1,169 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# COMPOSICIÓN, AGREGACIÓN Y ASOCIACIÓN: QUÉ VIAJA EN EL DTO Y CÓMO SE VE LA VUELTA
+# Es el mismo recorrido de la página de inicio (http://localhost:8000/).
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+# Los id que figuran en "Esperado" son los de un servidor recién reiniciado.
+#
+# La regla del archivo:
+#   - composición: viajan los DATOS de la parte (la línea nace con el pedido).
+#   - agregación y asociación: viaja el ID de algo que ya existe.
+# En la base, agregación y asociación se escriben igual (una clave foránea):
+# la diferencia «no está en la clave foránea sino en qué pasa al borrar»
+# (capítulo, sección 4.3).
+
+################################################################################
+# 1 · COMPOSICIÓN — Pedido ◆ DetallePedido (Actividad 6)
+################################################################################
+
+### 1) Un pedido con sus dos líneas adentro, en una sola petición
+# Qué decir: abrí pedidos/schemas.py → DetalleEnPedidoCreate: la línea no trae
+# id ni pedido_id, porque todavía no existen. Viajan sus datos.
+# En la misma petición hay dos relaciones: usuario_id es una asociación (un id)
+# y detalles es la composición (datos). Dentro de cada línea, producto_id
+# vuelve a ser un id: el producto ya existe.
+# Mirá la consola: INSERT INTO pedido, INSERT INTO detalle_pedido con las dos
+# líneas y un solo COMMIT. Después, tres SELECT: la vuelta, con la precarga de
+# obtener_con_detalles (diapositiva 14).
+# Esperado: 201 · {"id":104,"usuario_id":7,"usuario":{"id":7,"nombre":"Marta"},
+#   "detalles":[{"id":4,"producto_id":1,"cantidad":2},{"id":5,"producto_id":3,"cantidad":4}]}
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 7,
+  "detalles": [
+    { "producto_id": 1, "cantidad": 2 },
+    { "producto_id": 3, "cantidad": 4 }
+  ]
+}
+
+### 2) Las líneas quedaron guardadas, cada una con el id que le puso la base
+# Esperado: líneas 4 (Empanada ×2) y 5 (Alfajor ×4), las dos del pedido 104
+GET {{baseUrl}}/pedidos/104/detalles
+
+### 3) Todo o nada: la segunda línea apunta a un producto que no existe
+# Qué decir: la primera línea es válida. La base acepta el INSERT del pedido,
+# rechaza el de las líneas, y el rollback deshace las dos cosas.
+# Esperado: 409 · mensaje "Una línea apunta a un producto que no existe. No se
+# guardó nada: ni el pedido ni ninguna de sus líneas." · en mensaje_de_la_base
+# aparece detalle_pedido_producto_id_fkey
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 7,
+  "detalles": [
+    { "producto_id": 1, "cantidad": 2 },
+    { "producto_id": 999, "cantidad": 1 }
+  ]
+}
+
+### 4) No quedó ningún pedido nuevo
+# Esperado: 101, 102, 103 y 104. El que se intentó en el paso 3 no está.
+# (El número que la base le había reservado, el 105, se perdió: los contadores
+#  no retroceden. Por eso el próximo pedido va a ser el 106.)
+GET {{baseUrl}}/pedidos/
+
+### 5) Y tampoco quedó la línea que sí era válida
+# Esperado: cinco líneas — las tres de las diapositivas y las dos del pedido 104
+GET {{baseUrl}}/pedidos/detalles
+
+### 6) Qué pasa al borrar el todo: se borra el pedido 104
+# Qué decir: mirá la consola → un único DELETE FROM pedido. Las líneas las
+# borra la base: ON DELETE CASCADE. Se rompe el ticket y se van los renglones.
+# Esperado: 204
+DELETE {{baseUrl}}/pedidos/104
+
+### 7) Sus líneas se fueron con él
+# Esperado: []
+GET {{baseUrl}}/pedidos/104/detalles
+
+################################################################################
+# 2 · AGREGACIÓN — Categoría ◇ Producto (Actividad 6)
+################################################################################
+
+### 8) Las categorías ya existen antes que cualquier producto nuevo
+# Esperado: Comidas (1), Bebidas (2), Golosinas (3)
+GET {{baseUrl}}/categorias/
+
+### 9) Un producto nuevo en Comidas: viaja el ID de la categoría, no sus datos
+# Qué decir: abrí productos/schemas.py → ProductoCreate: categoria_id es un id.
+# La categoría no se crea ni se toca: el producto sólo la nombra.
+# Mirá la consola: INSERT INTO producto y, para la vuelta, UN solo SELECT con
+# LEFT OUTER JOIN categoria. Es joinedload: relación «a uno» (diap. 14).
+# Esperado: 201 · {"id":4,"nombre":"Locro","precio":"3500.00","categoria_id":1,
+#   "categoria":{"id":1,"nombre":"Comidas"}}
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Locro",
+  "precio": 3500,
+  "categoria_id": 1
+}
+
+### 10) La góndola Comidas, ahora con un producto más
+# Qué decir: la categoría es la misma fila de siempre; un producto más la nombra.
+# Esperado: Empanada y Locro
+GET {{baseUrl}}/categorias/1/productos
+
+### 11) El id de una categoría que no existe
+# (Otro nombre a propósito: el nombre del producto es único (diapositiva 18), y con "Locro"
+#  la base rechazaría primero el nombre repetido.)
+# Esperado: 409 · en mensaje_de_la_base aparece producto_categoria_id_fkey
+POST {{baseUrl}}/productos/
+Content-Type: {{json}}
+
+{
+  "nombre": "Humita",
+  "precio": 3000,
+  "categoria_id": 999
+}
+
+### 12) Qué pasa al borrar el todo: se intenta borrar Comidas
+# Qué decir: la góndola no se saca mientras tenga latas (ON DELETE RESTRICT).
+# La otra respuesta de la agregación, anular, es 05_al_borrar_anular.sql.
+# Esperado: 409 · en mensaje_de_la_base aparece producto_categoria_id_fkey
+DELETE {{baseUrl}}/categorias/1
+
+################################################################################
+# 3 · ASOCIACIÓN — Usuario — Pedido (Actividad 5)
+################################################################################
+
+### 13) Un pedido de Rubén, sin líneas: viaja sólo el ID del usuario
+# Qué decir: es el mismo DTO de la composición, sin detalles. Rubén no se crea
+# ni se modifica: ya existía, y la vuelta lo trae armado.
+# Esperado: 201 · {"id":106,"usuario_id":8,"usuario":{"id":8,"nombre":"Rubén"},"detalles":[]}
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 8
+}
+
+### 14) Los pedidos de Rubén
+# Qué decir: su fila no cambió; es cada pedido el que anota de quién es.
+# Esperado: 103 y 106
+GET {{baseUrl}}/usuarios/8/pedidos
+
+### 15) El id de un usuario que no existe (el caso de la diapositiva 4)
+# Esperado: 409 · en mensaje_de_la_base aparece pedido_usuario_id_fkey
+POST {{baseUrl}}/pedidos/
+Content-Type: {{json}}
+
+{
+  "usuario_id": 999
+}
+
+# Qué pasa al borrar al usuario: la API no tiene un endpoint para borrar
+# usuarios. Probado directo en la base (pgAdmin o psql):
+#   DELETE FROM usuario WHERE id = 7;
+#   ERROR:  update o delete en «usuario» viola la llave foránea
+#           «pedido_usuario_id_fkey» en la tabla «pedido»
+# pedido.usuario_id no declara ON DELETE (00_mirar_la_base.sql, diapositiva 4):
+# rige la regla por defecto de PostgreSQL, NO ACTION, que rechaza igual que RESTRICT.

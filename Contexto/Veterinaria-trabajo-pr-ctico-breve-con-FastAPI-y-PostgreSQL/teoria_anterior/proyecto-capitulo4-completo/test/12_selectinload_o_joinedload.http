@@ -1,0 +1,66 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 14 — PARA COLECCIONES, DOS CONSULTAS; PARA «A UNO», UN JOIN
+# "La fotocopia del encabezado"
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+
+### 1) Con selectinload: dos consultas
+# Qué decir: una para los pedidos y otra con IN para sus líneas. Cada pedido
+# viaja una sola vez.
+# Esperado: consultas_emitidas 2
+GET {{baseUrl}}/pedidos/con-detalles-selectinload
+
+### 2) Con joinedload: una sola consulta, con JOIN
+# Qué decir: mirá la consola: un único SELECT ... FROM pedido LEFT OUTER JOIN
+# detalle_pedido. El resultado en Python es el mismo que el del paso 1.
+# Abrí pedidos/service.py → listar_con_detalles_joinedload: el .unique() es
+# obligatorio con joinedload de una colección, porque el JOIN trae una fila
+# por línea y el pedido 101 llega dos veces.
+# Esperado: consultas_emitidas 1 · los mismos pedidos y líneas que el paso 1
+GET {{baseUrl}}/pedidos/con-detalles-joinedload
+
+### 3) Lo que viajó en ese JOIN
+# Qué decir: las filas tal como las devuelve la base. El 101 viene dos veces,
+# con sus datos repetidos, una vez por línea. El 103 viene una vez, con la
+# línea vacía, porque el JOIN es externo.
+# Esperado: 4 filas · 101 dos veces · 102 una vez · 103 con la línea en null
+GET {{baseUrl}}/pedidos/filas-del-join
+
+### 4) Al pedido 101 se le agregan dos líneas más
+# Esperado: 201
+POST {{baseUrl}}/pedidos/101/detalles
+Content-Type: {{json}}
+
+{
+  "producto_id": 3,
+  "cantidad": 2
+}
+
+### 5) Otra más
+# Esperado: 201
+POST {{baseUrl}}/pedidos/101/detalles
+Content-Type: {{json}}
+
+{
+  "producto_id": 1,
+  "cantidad": 6
+}
+
+### 6) El JOIN otra vez
+# Qué decir: el 101 ahora viene cuatro veces, con los datos del pedido
+# repetidos en cada fila. Con veinte líneas serían veinte filas con el pedido
+# repetido veinte veces: la fotocopia del encabezado en cada renglón.
+# Esperado: 6 filas · el 101 cuatro veces
+GET {{baseUrl}}/pedidos/filas-del-join
+
+### 7) Y con selectinload, siguen siendo dos consultas
+# Qué decir: el pedido viene una vez y sus cuatro líneas aparte. Por eso, para
+# colecciones (uno a muchos), selectinload. joinedload conviene para las
+# relaciones a uno, como pedido.usuario: ahí el JOIN no multiplica las filas,
+# sigue habiendo una sola fila por pedido.
+# Esperado: consultas_emitidas 2 · el 101 con cuatro líneas
+GET {{baseUrl}}/pedidos/con-detalles-selectinload

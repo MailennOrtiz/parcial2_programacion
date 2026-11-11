@@ -1,0 +1,85 @@
+# Preparación: ejecutar python reiniciar.py antes de este archivo.
+# Ejecutar las peticiones en orden con REST Client de VS Code.
+@baseUrl = http://localhost:8000
+
+### C-01: 422. El parámetro de ruta no es entero; el handler no se ejecuta.
+GET {{baseUrl}}/duenios/abc
+
+### 200. Ana con su ficha como objeto, no lista.
+GET {{baseUrl}}/duenios/1
+
+### 200. Toby y Mora, las dos mascotas de Ana.
+GET {{baseUrl}}/duenios/1/mascotas
+
+### 404. Dueño inexistente.
+GET {{baseUrl}}/duenios/999999
+
+### C-02: 409 con mensaje propio. El email ya está en la base.
+POST {{baseUrl}}/duenios/
+Content-Type: application/json
+
+{
+  "nombre": "Otra Ana",
+  "email": "ana@example.com"
+}
+
+### C-03: 409. Ana ya tiene una ficha.
+POST {{baseUrl}}/duenios/1/ficha
+Content-Type: application/json
+
+{
+  "telefono": "1155559999",
+  "direccion": "Otra dirección 123"
+}
+
+### C-05 (dueño): 409. La base impide borrar a Ana porque tiene mascotas.
+DELETE {{baseUrl}}/duenios/1
+
+### 201. Dueño nuevo sin mascotas ni ficha. Guardamos el id de la respuesta.
+# @name nuevoDuenio
+POST {{baseUrl}}/duenios/
+Content-Type: application/json
+
+{
+  "nombre": "Eva López",
+  "email": "eva@example.com"
+}
+
+### 201. Primera ficha para Eva.
+POST {{baseUrl}}/duenios/{{nuevoDuenio.response.body.$.id}}/ficha
+Content-Type: application/json
+
+{
+  "telefono": "1155550202",
+  "direccion": "Belgrano 456"
+}
+
+### 200. Solo cambia el nombre; conserva email y ficha.
+PATCH {{baseUrl}}/duenios/{{nuevoDuenio.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "nombre": "Eva López actualizada"
+}
+
+### 409. No puede usar el email de otro dueño. El cambio anterior se conserva.
+PATCH {{baseUrl}}/duenios/{{nuevoDuenio.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "email": "ana@example.com"
+}
+
+### 422. Omitir un campo está permitido; enviar null no lo está.
+PATCH {{baseUrl}}/duenios/{{nuevoDuenio.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "nombre": null
+}
+
+### 204 sin cuerpo. Eva no tiene mascotas; su ficha se elimina en la base.
+DELETE {{baseUrl}}/duenios/{{nuevoDuenio.response.body.$.id}}
+
+### 404. El dueño recién borrado ya no existe.
+GET {{baseUrl}}/duenios/{{nuevoDuenio.response.body.$.id}}

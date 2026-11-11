@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relaciones — Capítulo 4, Partes 1 y 2</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --navy: #1F4E78;
+    --navy-dark: #14202A;
+    --ink: #1F2D3D;
+    --muted: #5A6470;
+    --blue-border: #1F6FB5;
+    --blue-fill: #EEF4FB;
+    --orange-border: #CF7A1B;
+    --orange-fill: #FDF3E6;
+    --green-border: #2D7D57;
+    --green-fill: #EEF8F2;
+    --code-fill: #1E2A38;
+    --code-text: #E8ECF0;
+    --line: #c6cdd5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Calibri, "Segoe UI", Arial, sans-serif;
+    color: var(--ink);
+    background: white;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 4rem;
+    line-height: 1.45;
+  }
+  h1 { color: var(--navy-dark); font-size: 1.9rem; margin-bottom: 0.2rem; }
+  .subtitulo { color: var(--muted); font-style: italic; margin-top: 0; margin-bottom: 1rem; }
+  nav.indice-rapido { font-size: 0.92rem; margin: 0.5rem 0 1.5rem; }
+  nav.indice-rapido a { color: var(--navy); margin-right: 0.9rem; }
+  h2 {
+    color: var(--navy);
+    border-bottom: 2px solid var(--navy);
+    padding-bottom: 0.25rem;
+    margin-top: 2.75rem;
+    font-size: 1.25rem;
+  }
+  h2 .numero {
+    display: inline-block;
+    background: var(--navy);
+    color: white;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1.6rem;
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+  }
+  h3 { font-size: 1.02rem; margin: 0.2rem 0 0.5rem; color: var(--navy-dark); }
+  .ruta {
+    display: inline-block;
+    font-family: Consolas, monospace;
+    background: var(--navy-dark);
+    color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+  .archivo { color: var(--muted); font-size: 0.82rem; }
+  .chico { font-size: 0.82rem; color: var(--muted); }
+  .callout {
+    border-left: 4px solid var(--blue-border);
+    background: var(--blue-fill);
+    padding: 0.65rem 0.9rem;
+    margin: 0.7rem 0;
+    font-size: 0.93rem;
+  }
+  .callout.verde { border-left-color: var(--green-border); background: var(--green-fill); }
+  .callout.naranja { border-left-color: var(--orange-border); background: var(--orange-fill); }
+
+  .tarjeta {
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    background: white;
+    margin: 0.75rem 0;
+  }
+  .tarjeta.naranja { border-color: var(--orange-border); background: var(--orange-fill); }
+  .tarjeta.verde { border-color: var(--green-border); background: var(--green-fill); }
+  .tarjeta.info { border-color: var(--blue-border); background: var(--blue-fill); }
+  .tarjeta h3.naranja-tit { color: var(--orange-border); }
+  .tarjeta h3.verde-tit { color: var(--green-border); }
+
+  .fila-comparacion { display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: stretch; }
+  .col-comparacion { flex: 1; min-width: 340px; }
+
+  .etiqueta {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: bold;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+  .etiqueta.datos { color: var(--green-border); }
+  .etiqueta.id { color: var(--blue-border); }
+
+  textarea.dto {
+    width: 100%;
+    font-family: Consolas, monospace;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    background: white;
+    color: var(--ink);
+    resize: vertical;
+  }
+  input[type="number"] {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.9rem;
+    width: 7rem;
+    margin-right: 0.5rem;
+  }
+  label { font-size: 0.85rem; color: var(--muted); margin-right: 0.3rem; }
+
+  button {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.9rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin: 0.4rem 0.4rem 0.4rem 0;
+  }
+  button:hover { background: var(--navy-dark); }
+  button.secundario { background: white; color: var(--navy); border: 1px solid var(--navy); }
+  button.naranja { background: var(--orange-border); }
+  button.naranja:hover { background: #a8630f; }
+  button.verde { background: var(--green-border); }
+  button.verde:hover { background: #205f40; }
+  button.mini { padding: 0.25rem 0.6rem; font-size: 0.82rem; margin: 0.15rem 0; }
+
+  pre.resultado {
+    background: var(--code-fill);
+    color: var(--code-text);
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 2.6rem;
+    margin-top: 0.4rem;
+    overflow-x: auto;
+  }
+  pre.resultado.con-error { border-left: 5px solid var(--orange-border); }
+  pre.codigo {
+    background: var(--code-fill);
+    color: var(--code-text);
+    padding: 0.6rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+    margin: 0.5rem 0;
+    overflow-x: auto;
+  }
+  .lectura {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.4rem;
+    border-radius: 6px;
+    display: none;
+  }
+  .lectura.ok { display: block; background: var(--green-fill); border: 1px solid var(--green-border); }
+  .lectura.aviso { display: block; background: var(--orange-fill); border: 1px solid var(--orange-border); }
+  .lectura.info { display: block; background: var(--blue-fill); border: 1px solid var(--blue-border); }
+
+  table.demo, table.resumen { border-collapse: collapse; width: 100%; margin-top: 0.5rem; font-size: 0.88rem; }
+  table.demo th, table.demo td, table.resumen th, table.resumen td {
+    border: 1px solid var(--line); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top;
+  }
+  table.demo th, table.resumen th { background: #eef1f4; }
+  table.resumen td:first-child { font-weight: bold; white-space: nowrap; }
+  table.esquema { border-collapse: collapse; font-size: 0.85rem; margin-top: 0.3rem; }
+  table.esquema caption { text-align: left; font-weight: bold; color: var(--navy); padding-bottom: 0.2rem; font-family: Consolas, monospace; }
+  table.esquema td { border: 1px solid var(--line); padding: 0.25rem 0.55rem; }
+  table.esquema td:first-child { font-family: Consolas, monospace; white-space: nowrap; }
+  td.clave { background: var(--orange-fill); }
+
+  .diagrama { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+  .diagrama svg { width: 100%; max-width: 560px; height: auto; }
+  code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; }
+  pre code { background: none; padding: 0; }
+  footer { color: var(--muted); font-size: 0.85rem; margin-top: 3rem; }
+</style>
+</head>
+<body>
+
+<h1>Relaciones — Capítulo 4 en vivo</h1>
+<p class="subtitulo">Composición, agregación y asociación: qué viaja en el DTO al crear cada una, y cómo se ve la vuelta. Cada botón dispara una petición real contra este mismo servidor (mismo origen, sin CORS) y muestra la respuesta tal cual llegó: no un resultado esperado en teoría.</p>
+
+<div class="callout naranja">
+  <strong>Ojo: los botones escriben en la base de verdad.</strong> Para volver a los datos iniciales —los de las diapositivas: Marta (7), Rubén (8) y los pedidos 101 a 103— corré <code>python reiniciar.py</code> (no hace falta apagar el servidor). Los archivos de <code>test/</code> suponen ese punto de partida.
+</div>
+
+<nav class="indice-rapido">
+  <a href="/">Inicio</a>
+  <a href="#resumen">Qué viaja en el DTO</a>
+  <a href="#composicion">1 · Composición</a>
+  <a href="#agregacion">2 · Agregación</a>
+  <a href="#asociacion">3 · Asociación</a>
+  <a href="#navegacion">Navegación</a>
+  <a href="#indice">Índice de las demos</a>
+  <a href="/docs">/docs</a>
+</nav>
+
+<!-- ═══════════════════════════════ RESUMEN ═══════════════════════════════ -->
+<h2 id="resumen">De un vistazo: qué viaja en el DTO</h2>
+<table class="resumen">
+  <thead>
+    <tr><th>Relación</th><th>En el diagrama de clases</th><th>En la base</th><th>Qué viaja en el DTO</th><th>Dónde se prueba</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Composición<br><span class="chico">Actividad 6</span></td>
+      <td>Pedido ◆— DetallePedido<br><span class="chico">la parte no existe sin el todo</span></td>
+      <td><code>detalle_pedido.pedido_id</code> → <code>pedido.id</code></td>
+      <td><strong>Los datos</strong> de cada línea, adentro del pedido <span class="etiqueta datos">datos</span></td>
+      <td><a href="#composicion">1</a> · <code>POST /pedidos/</code>, campo <code>detalles</code></td>
+    </tr>
+    <tr>
+      <td>Agregación<br><span class="chico">Actividad 6</span></td>
+      <td>Categoría ◇— Producto<br><span class="chico">la parte existe sin el todo</span></td>
+      <td><code>producto.categoria_id</code> → <code>categoria.id</code></td>
+      <td><strong>El id</strong> de una categoría que ya existe <span class="etiqueta id">id</span></td>
+      <td><a href="#agregacion">2</a> · <code>POST /productos/</code>, campo <code>categoria_id</code></td>
+    </tr>
+    <tr>
+      <td>Asociación<br><span class="chico">Actividad 5</span></td>
+      <td>Usuario — Pedido<br><span class="chico">se conocen; ninguno es parte del otro</span></td>
+      <td><code>pedido.usuario_id</code> → <code>usuario.id</code></td>
+      <td><strong>El id</strong> de un usuario que ya existe <span class="etiqueta id">id</span></td>
+      <td><a href="#asociacion">3</a> · <code>POST /pedidos/</code>, campo <code>usuario_id</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>Lo que la base no distingue.</strong> En la base, la agregación y la asociación se escriben igual: una clave foránea, y en el DTO viaja un id. Lo que cambia es el significado: la categoría agrupa productos que existen sin ella (todo y parte), mientras que el usuario y su pedido se conocen sin que uno sea parte del otro. La composición es la única en la que viajan los <em>datos</em> de la parte, porque la parte no existe antes que el todo.
+</div>
+<div class="callout verde">
+  <strong>Una petición, dos relaciones.</strong> Fijate que <code>POST /pedidos/</code> trae las dos formas a la vez: <code>usuario_id</code> es una asociación (viaja un id) y <code>detalles</code> es una composición (viajan datos). Y adentro de cada línea, <code>producto_id</code> vuelve a ser un id: el producto ya existe, la línea sólo lo nombra.
+</div>
+
+<!-- ═══════════════════════════════ NAVEGACIÓN ════════════════════════════ -->
+<h2 id="navegacion">La navegación: cada clave foránea, de los dos lados</h2>
+<p>Cada <code>Field(foreign_key=...)</code> es lo que se <strong>guarda</strong>; cada <code>Relationship(back_populates=...)</code> es cómo se <strong>navega</strong> desde Python, y no agrega columnas. Todas son de carga perezosa: en este proyecto, tocarlas sin precargar explota (diapositiva 15), así que cada lectura que las usa declara su <code>selectinload</code> o <code>joinedload</code>.</p>
+<table class="resumen">
+  <thead>
+    <tr><th>Clave foránea</th><th>Se navega con</th><th>Tipo</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>pedido.usuario_id</code></td><td><code>pedido.usuario</code> ↔ <code>usuario.pedidos</code></td><td>Asociación, uno a muchos</td></tr>
+    <tr><td><code>detalle_pedido.pedido_id</code></td><td><code>linea.pedido</code> ↔ <code>pedido.detalles</code></td><td>Composición</td></tr>
+    <tr><td><code>detalle_pedido.producto_id</code></td><td><code>linea.producto</code> ↔ <code>producto.detalles</code></td><td>Uno a muchos</td></tr>
+    <tr><td><code>producto.categoria_id</code></td><td><code>producto.categoria</code> ↔ <code>categoria.productos</code></td><td>Agregación</td></tr>
+    <tr><td><code>producto_ingrediente.producto_id</code><br><code>producto_ingrediente.ingrediente_id</code></td><td><code>producto.ingredientes[i].ingrediente</code><br><code>ingrediente.productos[i].producto</code></td><td>Muchos a muchos: se pasa por la fila de la receta, que trae <code>cantidad</code></td></tr>
+    <tr><td><code>perfil.usuario_id</code> (único)</td><td><code>perfil.usuario</code> ↔ <code>usuario.perfil</code></td><td>Uno a uno: <code>usuario.perfil</code> es uno solo</td></tr>
+    <tr><td><code>perfil_sin_unicidad.usuario_id</code></td><td><code>perfil.usuario</code> ↔ <code>usuario.perfiles_sin_unicidad</code></td><td>Sin unicidad es una lista: uno a muchos</td></tr>
+  </tbody>
+</table>
+<div class="callout">
+  <strong>El muchos a muchos.</strong> Fijate que <code>producto.ingredientes</code> no es una lista de ingredientes sino de <em>filas de la receta</em>, porque la cantidad es un dato de la relación.
+</div>
+
+<!-- ═══════════════════════════════ 1 · COMPOSICIÓN ═══════════════════════ -->
+<h2 id="composicion"><span class="numero">1</span>Composición — <code>POST /pedidos/</code> con sus líneas adentro</h2>
+<p><strong>De POO (Actividad 6):</strong> en la composición el todo crea sus partes, y las partes no tienen sentido sin él: un renglón no existe sin su ticket. Por eso, al crear el pedido, las líneas no se mandan aparte ni con un id: viajan <strong>sus datos</strong>, adentro del DTO del pedido, y nacen con él.</p>
+
+<div class="tarjeta">
+  <div class="diagrama">
+    <svg viewBox="0 0 560 110" role="img" aria-label="Diagrama de clases: Pedido compone DetallePedido (rombo lleno del lado de Pedido), uno a cero o más">
+      <rect x="10" y="30" width="170" height="54" rx="6" fill="#EEF4FB" stroke="#1F4E78" stroke-width="2"/>
+      <text x="95" y="63" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="18" font-weight="bold" fill="#14202A">Pedido</text>
+      <polygon points="180,57 198,47 216,57 198,67" fill="#1F4E78" stroke="#1F4E78" stroke-width="2"/>
+      <line x1="216" y1="57" x2="380" y2="57" stroke="#1F4E78" stroke-width="2"/>
+      <rect x="380" y="30" width="170" height="54" rx="6" fill="#EEF4FB" stroke="#1F4E78" stroke-width="2"/>
+      <text x="465" y="63" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="18" font-weight="bold" fill="#14202A">DetallePedido</text>
+      <text x="226" y="48" font-family="Calibri, Segoe UI, Arial" font-size="15" fill="#5A6470">1</text>
+      <text x="340" y="48" font-family="Calibri, Segoe UI, Arial" font-size="15" fill="#5A6470">0..*</text>
+      <text x="298" y="82" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="14" fill="#CF7A1B">nace con el pedido</text>
+    </svg>
+    <table class="esquema">
+      <caption>detalle_pedido</caption>
+      <tr><td>id</td><td>clave primaria: la pone la base</td></tr>
+      <tr><td class="clave">pedido_id</td><td class="clave">→ <code>pedido.id</code></td></tr>
+      <tr><td>producto_id</td><td>→ <code>producto.id</code></td></tr>
+      <tr><td>cantidad</td><td>dato propio de la línea</td></tr>
+    </table>
+  </div>
+  <span class="archivo">pedidos/schemas.py · el DTO (resumido)</span>
+  <pre class="codigo">class DetalleEnPedidoCreate(SQLModel):
+    producto_id: int
+    cantidad: int
+
+class PedidoCreate(SQLModel):
+    usuario_id: int                              # asociación: viaja un id
+    detalles: list[DetalleEnPedidoCreate] = []   # composición: viajan los datos</pre>
+  <span class="archivo">pedidos/service.py · crear_pedido (fragmento)</span>
+  <pre class="codigo">pedido = Pedido(usuario_id=datos.usuario_id)
+for linea in datos.detalles:
+    pedido.detalles.append(DetallePedido(producto_id=linea.producto_id, cantidad=linea.cantidad))
+session.add(pedido)        # las líneas entran a la base con él
+await session.commit()
+return await obtener_con_detalles(session, pedido.id)   # la vuelta, con la precarga declarada</pre>
+</div>
+
+<div class="fila-comparacion">
+  <div class="col-comparacion">
+    <div class="tarjeta">
+      <h3>Lo que viaja: el DTO <span class="etiqueta id">usuario_id: id</span><span class="etiqueta datos">detalles: datos</span></h3>
+      <span class="ruta">POST /pedidos/</span>
+      <textarea class="dto" id="in-comp-ok" rows="9" spellcheck="false"></textarea>
+      <button onclick="enviar('comp-ok', '/pedidos/', lecturaPedido)">Enviar</button>
+      <button class="secundario" onclick="restaurar('comp-ok')">restaurar el ejemplo</button>
+    </div>
+  </div>
+  <div class="col-comparacion">
+    <div class="tarjeta verde">
+      <h3 class="verde-tit">La vuelta: la respuesta real</h3>
+      <pre class="resultado" id="r-comp-ok">(todavía no se envió nada)</pre>
+      <div class="lectura" id="l-comp-ok"></div>
+    </div>
+  </div>
+</div>
+<div class="callout">
+  <strong>Qué mirar.</strong> La vuelta trae lo que quedó guardado: el <code>id</code> que la base le puso al pedido y a cada línea, <code>usuario_id</code> tal como se guardó y, al lado, el usuario armado. En la consola de uvicorn: un <code>INSERT INTO pedido</code>, un <code>INSERT INTO detalle_pedido</code> con todas las líneas y un solo <code>COMMIT</code>. Después, tres <code>SELECT</code>: es la vuelta, leída con la precarga de <code>obtener_con_detalles</code> (diapositiva 14).
+</div>
+
+
+<!-- ═══════════════════════════════ 2 · AGREGACIÓN ════════════════════════ -->
+<h2 id="agregacion"><span class="numero">2</span>Agregación — <code>POST /productos/</code> con el id de su categoría</h2>
+<p><strong>De POO (Actividad 6):</strong> en la agregación el todo agrupa partes que pueden existir sin él: si se saca la góndola, las latas siguen existiendo. La categoría existe antes que el producto y va a seguir existiendo después, así que al crear el producto viaja <strong>su id</strong>, no sus datos.</p>
+
+<div class="tarjeta">
+  <div class="diagrama">
+    <svg viewBox="0 0 560 110" role="img" aria-label="Diagrama de clases: Categoría agrega Producto (rombo vacío del lado de Categoría), cero o uno a cero o más">
+      <rect x="10" y="30" width="170" height="54" rx="6" fill="#EEF4FB" stroke="#1F4E78" stroke-width="2"/>
+      <text x="95" y="63" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="18" font-weight="bold" fill="#14202A">Categoría</text>
+      <polygon points="180,57 198,47 216,57 198,67" fill="white" stroke="#1F4E78" stroke-width="2"/>
+      <line x1="216" y1="57" x2="380" y2="57" stroke="#1F4E78" stroke-width="2"/>
+      <rect x="380" y="30" width="170" height="54" rx="6" fill="#EEF4FB" stroke="#1F4E78" stroke-width="2"/>
+      <text x="465" y="63" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="18" font-weight="bold" fill="#14202A">Producto</text>
+      <text x="226" y="48" font-family="Calibri, Segoe UI, Arial" font-size="15" fill="#5A6470">0..1</text>
+      <text x="340" y="48" font-family="Calibri, Segoe UI, Arial" font-size="15" fill="#5A6470">0..*</text>
+      <text x="298" y="82" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="14" fill="#CF7A1B">cada uno con vida propia</text>
+    </svg>
+    <table class="esquema">
+      <caption>producto</caption>
+      <tr><td>id</td><td>clave primaria: la pone la base</td></tr>
+      <tr><td>nombre</td><td>único</td></tr>
+      <tr><td>precio</td><td>CHECK precio &gt; 0</td></tr>
+      <tr><td class="clave">categoria_id</td><td class="clave">→ <code>categoria.id</code> · admite vacío</td></tr>
+    </table>
+  </div>
+  <span class="archivo">productos/schemas.py · el DTO (resumido)</span>
+  <pre class="codigo">class ProductoCreate(SQLModel):
+    nombre: str
+    precio: Decimal
+    categoria_id: int | None = None   # agregación: el id de una categoría que ya existe</pre>
+  <span class="archivo">productos/service.py · crear_producto, la vuelta (fragmento)</span>
+  <pre class="codigo">consulta = (
+    select(Producto)
+    .where(Producto.id == producto.id)
+    .options(joinedload(Producto.categoria))   # relación «a uno»: joinedload
+)</pre>
+</div>
+
+<div class="fila-comparacion">
+  <div class="col-comparacion">
+    <div class="tarjeta">
+      <h3>Lo que viaja: el DTO <span class="etiqueta id">categoria_id: id</span></h3>
+      <span class="ruta">POST /productos/</span>
+      <textarea class="dto" id="in-agre-ok" rows="5" spellcheck="false"></textarea>
+      <button onclick="enviar('agre-ok', '/productos/', lecturaProducto)">Enviar</button>
+      <button class="secundario" onclick="restaurar('agre-ok')">restaurar el ejemplo</button>
+      <button class="secundario" onclick="ver('/categorias/1/productos', 'r-agre-ver', 'l-agre-ver', lecturaGondola)">ver la góndola: GET /categorias/1/productos</button>
+    </div>
+  </div>
+  <div class="col-comparacion">
+    <div class="tarjeta verde">
+      <h3 class="verde-tit">La vuelta: la respuesta real</h3>
+      <pre class="resultado" id="r-agre-ok">(todavía no se envió nada)</pre>
+      <div class="lectura" id="l-agre-ok"></div>
+      <pre class="resultado" id="r-agre-ver" style="display:none"></pre>
+      <div class="lectura" id="l-agre-ver"></div>
+    </div>
+  </div>
+</div>
+<div class="callout">
+  <strong>Qué mirar.</strong> En la consola: un <code>INSERT INTO producto</code> y, para la vuelta, <strong>un solo</strong> <code>SELECT</code> con <code>LEFT OUTER JOIN categoria</code>. Es <code>joinedload</code>, porque es una relación «a uno» (diapositiva 14). La categoría no se creó ni se modificó: ya existía, y el producto sólo la nombra.
+</div>
+
+<div class="tarjeta naranja">
+  <h3 class="naranja-tit">El id de una categoría que no existe</h3>
+  <div class="fila-comparacion">
+    <div class="col-comparacion">
+      <span class="ruta">POST /productos/</span>
+      <textarea class="dto" id="in-agre-error" rows="5" spellcheck="false"></textarea>
+      <button class="naranja" onclick="enviar('agre-error', '/productos/', lecturaProducto)">Enviar</button>
+      <button class="secundario" onclick="restaurar('agre-error')">restaurar el ejemplo</button>
+    </div>
+    <div class="col-comparacion">
+      <pre class="resultado" id="r-agre-error">(todavía no se envió nada)</pre>
+      <div class="lectura" id="l-agre-error"></div>
+    </div>
+  </div>
+</div>
+<div class="callout">
+  <strong>¿Y si en lugar del id viajaran los datos de la categoría?</strong> Sería tratarla como una composición: cada producto nuevo crearía su propia categoría, y «Comidas» terminaría repetida una vez por producto. En la agregación cada uno tiene vida propia: la categoría se crea una vez (<code>POST /categorias/</code>) y los productos la nombran por su id.
+</div>
+
+
+<!-- ═══════════════════════════════ 3 · ASOCIACIÓN ════════════════════════ -->
+<h2 id="asociacion"><span class="numero">3</span>Asociación — <code>POST /pedidos/</code> con el id de su usuario</h2>
+<p><strong>De POO (Actividad 5):</strong> en la asociación dos objetos se conocen sin que uno sea parte del otro. Rubén hace pedidos, pero un pedido no es un pedazo de Rubén: él existía antes y sigue existiendo después. Al crear el pedido viaja <strong>el id</strong> del usuario.</p>
+
+<div class="tarjeta">
+  <div class="diagrama">
+    <svg viewBox="0 0 560 110" role="img" aria-label="Diagrama de clases: Usuario asociado a Pedido con una línea simple, uno a cero o más">
+      <rect x="10" y="30" width="170" height="54" rx="6" fill="#EEF4FB" stroke="#1F4E78" stroke-width="2"/>
+      <text x="95" y="63" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="18" font-weight="bold" fill="#14202A">Usuario</text>
+      <line x1="180" y1="57" x2="380" y2="57" stroke="#1F4E78" stroke-width="2"/>
+      <rect x="380" y="30" width="170" height="54" rx="6" fill="#EEF4FB" stroke="#1F4E78" stroke-width="2"/>
+      <text x="465" y="63" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="18" font-weight="bold" fill="#14202A">Pedido</text>
+      <text x="190" y="48" font-family="Calibri, Segoe UI, Arial" font-size="15" fill="#5A6470">1</text>
+      <text x="340" y="48" font-family="Calibri, Segoe UI, Arial" font-size="15" fill="#5A6470">0..*</text>
+      <text x="280" y="82" text-anchor="middle" font-family="Calibri, Segoe UI, Arial" font-size="14" fill="#CF7A1B">se conocen</text>
+    </svg>
+    <table class="esquema">
+      <caption>pedido</caption>
+      <tr><td>id</td><td>clave primaria: la pone la base</td></tr>
+      <tr><td class="clave">usuario_id</td><td class="clave">→ <code>usuario.id</code></td></tr>
+    </table>
+  </div>
+  <span class="archivo">pedidos/schemas.py · el mismo DTO de la composición (resumido)</span>
+  <pre class="codigo">class PedidoCreate(SQLModel):
+    usuario_id: int                              # asociación: viaja un id
+    detalles: list[DetalleEnPedidoCreate] = []   # si no viene, el pedido nace sin líneas</pre>
+</div>
+
+<div class="fila-comparacion">
+  <div class="col-comparacion">
+    <div class="tarjeta">
+      <h3>Lo que viaja: el DTO <span class="etiqueta id">usuario_id: id</span></h3>
+      <span class="ruta">POST /pedidos/</span>
+      <textarea class="dto" id="in-asoc-ok" rows="4" spellcheck="false"></textarea>
+      <button onclick="enviar('asoc-ok', '/pedidos/', lecturaAsociacion)">Enviar</button>
+      <button class="secundario" onclick="restaurar('asoc-ok')">restaurar el ejemplo</button>
+      <button class="secundario" onclick="ver('/usuarios/8/pedidos', 'r-asoc-ver', 'l-asoc-ver', lecturaPedidosDeRuben)">los pedidos de Rubén: GET /usuarios/8/pedidos</button>
+    </div>
+  </div>
+  <div class="col-comparacion">
+    <div class="tarjeta verde">
+      <h3 class="verde-tit">La vuelta: la respuesta real</h3>
+      <pre class="resultado" id="r-asoc-ok">(todavía no se envió nada)</pre>
+      <div class="lectura" id="l-asoc-ok"></div>
+      <pre class="resultado" id="r-asoc-ver" style="display:none"></pre>
+      <div class="lectura" id="l-asoc-ver"></div>
+    </div>
+  </div>
+</div>
+
+<div class="tarjeta naranja">
+  <h3 class="naranja-tit">El id de un usuario que no existe <span class="chico">(es el caso de la diapositiva 4)</span></h3>
+  <div class="fila-comparacion">
+    <div class="col-comparacion">
+      <span class="ruta">POST /pedidos/</span>
+      <textarea class="dto" id="in-asoc-error" rows="4" spellcheck="false"></textarea>
+      <button class="naranja" onclick="enviar('asoc-error', '/pedidos/', lecturaAsociacion)">Enviar</button>
+      <button class="secundario" onclick="restaurar('asoc-error')">restaurar el ejemplo</button>
+    </div>
+    <div class="col-comparacion">
+      <pre class="resultado" id="r-asoc-error">(todavía no se envió nada)</pre>
+      <div class="lectura" id="l-asoc-error"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════ ÍNDICE DE DEMOS ═══════════════════════ -->
+<h2 id="indice">Índice de las demos de las Partes 1 y 2</h2>
+<p>El recorrido completo de cada diapositiva está en <code>test/</code> (un archivo por diapositiva, con qué decir en cada paso). Acá van sólo las lecturas, para mostrarlas sin abrir REST Client.</p>
+<table class="demo">
+  <thead><tr><th>Diapositiva</th><th>Qué muestra</th><th>Endpoint</th><th>Archivo</th><th></th></tr></thead>
+  <tbody>
+    <tr><td>4</td><td>Con el número se llega al dueño</td><td><code>GET /pedidos/con-usuario</code></td><td><code>01</code></td><td><button class="mini" onclick="ver('/pedidos/con-usuario')">probar</button></td></tr>
+    <tr><td>4</td><td>Los pedidos de Marta se buscan</td><td><code>GET /usuarios/7/pedidos</code></td><td><code>02</code></td><td><button class="mini" onclick="ver('/usuarios/7/pedidos')">probar</button></td></tr>
+    <tr><td>5</td><td>Uno a uno: un perfil por usuario</td><td><code>GET /usuarios/7/perfil</code></td><td><code>03</code></td><td><button class="mini" onclick="ver('/usuarios/7/perfil')">probar</button></td></tr>
+    <tr><td>6</td><td>Muchos a muchos: la receta</td><td><code>GET /productos/1/ingredientes</code></td><td><code>04</code></td><td><button class="mini" onclick="ver('/productos/1/ingredientes')">probar</button></td></tr>
+    <tr><td>7</td><td>Las líneas de todos los pedidos</td><td><code>GET /pedidos/detalles</code></td><td><code>05</code></td><td><button class="mini" onclick="ver('/pedidos/detalles')">probar</button></td></tr>
+    <tr><td>12</td><td>Declarar no es cargar</td><td><code>GET /usuarios/7/que-hay-en-memoria</code></td><td><code>08</code></td><td><button class="mini" onclick="ver('/usuarios/7/que-hay-en-memoria')">probar</button></td></tr>
+    <tr><td>13</td><td>El N+1 (versión incorrecta, a propósito)</td><td><code>GET /pedidos/n-mas-1</code></td><td><code>09</code></td><td><button class="mini" onclick="ver('/pedidos/n-mas-1')">probar</button></td></tr>
+    <tr><td>15</td><td>Sin precarga: responde 500 a propósito</td><td><code>GET /pedidos/101/sin-precarga</code></td><td><code>10</code></td><td><button class="mini" onclick="ver('/pedidos/101/sin-precarga')">probar</button></td></tr>
+    <tr><td>14</td><td>La precarga con <code>selectinload</code></td><td><code>GET /pedidos/101/con-detalles</code></td><td><code>11</code></td><td><button class="mini" onclick="ver('/pedidos/101/con-detalles')">probar</button></td></tr>
+    <tr><td>14</td><td>El listado con <code>selectinload</code></td><td><code>GET /pedidos/con-detalles-selectinload</code></td><td><code>12</code></td><td><button class="mini" onclick="ver('/pedidos/con-detalles-selectinload')">probar</button></td></tr>
+    <tr><td>14</td><td>El mismo listado con <code>joinedload</code></td><td><code>GET /pedidos/con-detalles-joinedload</code></td><td><code>12</code></td><td><button class="mini" onclick="ver('/pedidos/con-detalles-joinedload')">probar</button></td></tr>
+    <tr><td>14</td><td>Las filas del JOIN: el pedido repetido por línea</td><td><code>GET /pedidos/filas-del-join</code></td><td><code>12</code></td><td><button class="mini" onclick="ver('/pedidos/filas-del-join')">probar</button></td></tr>
+  </tbody>
+</table>
+<pre class="resultado" id="r-indice">(elegí una fila)</pre>
+<div class="lectura" id="l-indice"></div>
+
+<footer>
+  Swagger, con todos los endpoints y sus esquemas: <a href="/docs">/docs</a>. Qué decir en cada archivo de <code>test/</code>: el <code>Readme.md</code> del proyecto. El recorrido de esta página, en archivo: <code>test/13_composicion_agregacion_asociacion.http</code>.
+</footer>
+
+<script>
+// Ejemplos de cada DTO, tal como se muestran en los cuadros de texto.
+const EJEMPLOS = {
+  'comp-ok': `{
+  "usuario_id": 7,
+  "detalles": [
+    { "producto_id": 1, "cantidad": 2 },
+    { "producto_id": 3, "cantidad": 4 }
+  ]
+}`,
+  'agre-ok': `{
+  "nombre": "Locro",
+  "precio": 3500,
+  "categoria_id": 1
+}`,
+  'agre-error': `{
+  "nombre": "Humita",
+  "precio": 3000,
+  "categoria_id": 999
+}`,
+  'asoc-ok': `{
+  "usuario_id": 8
+}`,
+  'asoc-error': `{
+  "usuario_id": 999
+}`,
+};
+
+function restaurar(id) {
+  document.getElementById('in-' + id).value = EJEMPLOS[id];
+}
+for (const id of Object.keys(EJEMPLOS)) restaurar(id);
+
+function esc(texto) {
+  return String(texto).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// Una petición real contra este mismo servidor. Devuelve el estado, el tiempo y el cuerpo.
+async function pedir(metodo, ruta, cuerpo) {
+  const opciones = { method: metodo, headers: {} };
+  if (cuerpo !== undefined) {
+    opciones.headers['Content-Type'] = 'application/json';
+    opciones.body = JSON.stringify(cuerpo);
+  }
+  const inicio = performance.now();
+  const resp = await fetch(ruta, opciones);
+  const ms = Math.round(performance.now() - inicio);
+  const texto = await resp.text();
+  let datos = null;
+  if (texto) {
+    try { datos = JSON.parse(texto); } catch (e) { datos = texto; }
+  }
+  return { status: resp.status, ms, datos };
+}
+
+function formatear(r, metodo, ruta) {
+  let t = `[${r.ms} ms] ${metodo} ${ruta} → HTTP ${r.status}\n`;
+  if (r.datos === null) t += '(sin cuerpo)';
+  else t += typeof r.datos === 'string' ? r.datos : JSON.stringify(r.datos, null, 2);
+  return t;
+}
+
+function mostrarTexto(idResultado, texto, conError) {
+  const el = document.getElementById(idResultado);
+  el.style.display = '';
+  el.textContent = texto;
+  el.classList.toggle('con-error', !!conError);
+}
+
+function lectura(idLectura, clase, html) {
+  const el = document.getElementById(idLectura);
+  if (!el) return;
+  el.className = 'lectura' + (clase ? ' ' + clase : '');
+  el.innerHTML = html || '';
+}
+
+// Lo que dijo la base cuando dijo que no (o FastAPI, si el DTO no pasó la validación).
+function lecturaError(r, idLectura) {
+  const det = r.datos && r.datos.detail;
+  if (r.status === 422 && Array.isArray(det)) {
+    const errores = det.map(e => `${(e.loc || []).join('.')}: ${e.msg}`).join(' · ');
+    lectura(idLectura, 'aviso', `FastAPI rechazó el DTO antes de llegar a la base (422): ${esc(errores)}`);
+    return;
+  }
+  if (det && typeof det === 'object' && det.mensaje) {
+    const base = det.mensaje_de_la_base || '';
+    const restricciones = [...base.matchAll(/«([^»]+)»/g)].map(m => m[1]).filter(n => /_(fkey|pkey|key)$/.test(n));
+    let html = `La base dijo que no: <strong>${esc(det.mensaje)}</strong>`;
+    if (restricciones.length) html += ` La restricción que habló: <code>${esc(restricciones[0])}</code>.`;
+    if (base) html += `<br><span class="chico">mensaje_de_la_base, tal cual: ${esc(base)}</span>`;
+    lectura(idLectura, 'aviso', html);
+    return;
+  }
+  lectura(idLectura, 'aviso', `HTTP ${r.status}: ${esc(typeof det === 'string' ? det : JSON.stringify(r.datos))}`);
+}
+
+// Lee el DTO del cuadro de texto, lo manda por POST y muestra la vuelta.
+async function enviar(idEjemplo, ruta, lector) {
+  const salida = 'r-' + idEjemplo, idLectura = 'l-' + idEjemplo;
+  let cuerpo;
+  try {
+    cuerpo = JSON.parse(document.getElementById('in-' + idEjemplo).value);
+  } catch (err) {
+    mostrarTexto(salida, 'El texto del DTO no es un JSON válido: ' + err.message, true);
+    lectura(idLectura, 'aviso', 'Corregí el JSON (o tocá «restaurar el ejemplo») y volvé a enviar.');
+    return;
+  }
+  mostrarTexto(salida, 'enviando…');
+  lectura(idLectura, '', '');
+  try {
+    const r = await pedir('POST', ruta, cuerpo);
+    mostrarTexto(salida, formatear(r, 'POST', ruta), r.status >= 400);
+    lector(r, cuerpo, idLectura);
+  } catch (err) {
+    mostrarTexto(salida, 'error de red: ' + err, true);
+  }
+}
+
+// ── 1 · Composición ──────────────────────────────────────────────────────────
+function lecturaPedido(r, enviado, idLectura) {
+  if (r.status !== 201 || !r.datos) { lecturaError(r, idLectura); return; }
+  const d = r.datos;
+  const ids = d.detalles.map(l => l.id);
+  let html = `La base le puso el id <strong>${d.id}</strong> al pedido`;
+  html += ids.length
+    ? ` y ${ids.length === 1 ? 'el id' : 'los ids'} <strong>${ids.join(', ')}</strong> a sus líneas: ninguno viajó en el DTO.`
+    : '. Sin líneas: el pedido nació vacío.';
+  html += ` Viajó <code>usuario_id: ${d.usuario_id}</code> —un id— y la vuelta trae al usuario armado: <strong>${esc(d.usuario.nombre)}</strong>.`;
+  if (ids.length) html += ` Las líneas viajaron como datos (<code>producto_id</code> y <code>cantidad</code>): nacieron con el pedido.`;
+  lectura(idLectura, 'ok', html);
+}
+
+// ── 2 · Agregación ───────────────────────────────────────────────────────────
+function lecturaProducto(r, enviado, idLectura) {
+  if (r.status !== 201 || !r.datos) { lecturaError(r, idLectura); return; }
+  const d = r.datos;
+  if (d.categoria) {
+    lectura(idLectura, 'ok', `Viajó <code>categoria_id: ${d.categoria_id}</code> —un id—, y la vuelta trae la categoría armada: <strong>${esc(d.categoria.nombre)}</strong>. ` +
+      'La categoría no se creó ni se tocó: ya existía, y el producto sólo la nombra.');
+  } else {
+    lectura(idLectura, 'ok', 'El producto se guardó sin categoría: en la agregación la parte puede existir sin el todo.');
+  }
+}
+
+function lecturaGondola(r, idLectura) {
+  if (r.status !== 200 || !Array.isArray(r.datos)) { lecturaError(r, idLectura); return; }
+  lectura(idLectura, 'info', `En la góndola Comidas hay ${r.datos.length} producto(s): ${r.datos.map(p => esc(p.nombre)).join(', ')}. ` +
+    'La categoría es la misma fila de siempre: lo que cambió es que un producto más la nombra.');
+}
+
+// ── 3 · Asociación ───────────────────────────────────────────────────────────
+function lecturaAsociacion(r, enviado, idLectura) {
+  if (r.status !== 201 || !r.datos) { lecturaError(r, idLectura); return; }
+  const d = r.datos;
+  let html = `Viajó <code>usuario_id: ${d.usuario_id}</code> —un id—. El usuario no se creó ni se modificó: ya existía, y la vuelta lo trae armado: <strong>${esc(d.usuario.nombre)}</strong>. ` +
+    `El pedido es el <strong>${d.id}</strong>`;
+  html += d.detalles.length ? `, con ${d.detalles.length} línea(s).` : ', sin líneas: no viajaron <code>detalles</code>.';
+  lectura(idLectura, 'ok', html);
+}
+
+function lecturaPedidosDeRuben(r, idLectura) {
+  if (r.status !== 200 || !Array.isArray(r.datos)) { lecturaError(r, idLectura); return; }
+  lectura(idLectura, 'info', `Rubén tiene ${r.datos.length} pedido(s): ${r.datos.map(p => p.id).join(', ')}. Su fila no cambió: es cada pedido el que anota de quién es.`);
+}
+
+// ── Lecturas sueltas (comprobaciones e índice de demos) ──────────────────────
+async function ver(ruta, salida = 'r-indice', idLectura = 'l-indice', lector) {
+  mostrarTexto(salida, 'pidiendo…');
+  lectura(idLectura, '', '');
+  try {
+    const r = await pedir('GET', ruta);
+    mostrarTexto(salida, formatear(r, 'GET', ruta), r.status >= 400);
+    if (lector) { lector(r, idLectura); return; }
+    if (r.datos && typeof r.datos === 'object' && 'consultas_emitidas' in r.datos) {
+      lectura(idLectura, 'info', `<strong>consultas_emitidas: ${r.datos.consultas_emitidas}</strong> (cuántas consultas llegaron a la base para armar esta respuesta).`);
+    } else if (r.status === 500 && r.datos && r.datos.detail && r.datos.detail.excepcion) {
+      lectura(idLectura, 'aviso', `500 a propósito: <code>${esc(r.datos.detail.excepcion)}</code>. ${esc(r.datos.detail.mensaje)}`);
+    }
+  } catch (err) {
+    mostrarTexto(salida, 'error de red: ' + err, true);
+  }
+}
+</script>
+</body>
+</html>

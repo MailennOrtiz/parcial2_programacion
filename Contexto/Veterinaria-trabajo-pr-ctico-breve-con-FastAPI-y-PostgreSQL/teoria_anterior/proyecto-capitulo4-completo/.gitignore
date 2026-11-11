@@ -1,0 +1,13 @@
+# Entorno virtual
+.venv/
+__pycache__/
+*.pyc
+
+# Variables de entorno: ACÁ vive la contraseña real, nunca en el código ni en el repositorio
+# (diapositiva 31).
+.env
+
+# Basura de editor y de sistema operativo
+.vscode/
+.idea/
+*.log

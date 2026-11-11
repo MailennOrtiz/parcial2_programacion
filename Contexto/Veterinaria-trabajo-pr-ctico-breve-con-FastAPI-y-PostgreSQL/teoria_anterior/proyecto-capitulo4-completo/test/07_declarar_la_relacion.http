@@ -1,0 +1,44 @@
+@baseUrl = http://localhost:8000
+@json = application/json
+
+################################################################################
+# DIAPOSITIVA 11 — LA RELACIÓN SE DECLARA EN LOS DOS EXTREMOS
+# "Un hilo con dos puntas" · Relationship(back_populates=...)
+################################################################################
+# Datos iniciales: los de las diapositivas. Para repetir este archivo desde cero,
+# corré `python reiniciar.py` (no hace falta apagar el servidor).
+#
+# Antes de correr: abrí pedidos/models.py y usuarios/models.py y mostrá los
+# Relationship(): Pedido.usuario ↔ Usuario.pedidos, unidos por back_populates.
+#
+# Relationship() NO crea columnas: corré otra vez 00_mirar_la_base.sql (las
+# consultas de la diapositiva 4) y las columnas de usuario y de
+# pedido son exactamente las mismas que antes de declarar la relación.
+
+### 1) Alta de Sofía con su primer pedido, en una sola petición
+# Qué decir: abrí usuarios/service.py → crear_usuario_con_primer_pedido.
+# usuario.pedidos.append(pedido) toca UNA sola punta del hilo.
+# "antes_de_guardar" muestra el pedido en memoria, antes de mandar nada a la base:
+#   pedido_usuario_es_el_usuario: true  → back_populates completó la otra punta
+#   pedido_usuario_id: null             → el número todavía no existe en ningún lado
+# Mirá la consola: INSERT INTO usuario y después INSERT INTO pedido (usuario_id).
+# En el DTO no viaja ningún id: el 9 (Sofía) y el 104 (su pedido) los asigna la
+# base, y el 9 lo copió el ORM en pedido.usuario_id al guardar.
+# Esperado: 201 · antes_de_guardar {true, null} · usuario {"id": 9, ...}
+#           · pedido {"id": 104, "usuario_id": 9}
+POST {{baseUrl}}/usuarios/con-primer-pedido
+Content-Type: {{json}}
+
+{
+  "nombre": "Sofía"
+}
+
+### 2) Lo que quedó guardado es la misma clave foránea de la Parte 1
+# Qué decir: en la tabla pedido quedó un número, el 9. La relación se guarda
+# igual que antes; lo nuevo es que desde Python se puede navegar.
+# Esperado: [{"id": 104, "usuario_id": 9}]
+GET {{baseUrl}}/usuarios/9/pedidos
+
+### 3) Y la fila de Sofía sigue sin ninguna columna de pedidos
+# Esperado: {"id": 9, "nombre": "Sofía"}
+GET {{baseUrl}}/usuarios/9
