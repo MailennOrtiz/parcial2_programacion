@@ -1,7 +1,20 @@
-"""Importa todas las tablas antes de configurar relaciones o crear el esquema.
+"""Importa todas las tablas antes de configurar relaciones o crear el esquema."""
 
-En el ejercicio 1 no existen modelos de dominio; los imports se agregan
-a medida que se implementan los ejercicios siguientes.
-"""
+from app.modules.editoriales.models import Editorial
+from app.modules.generos.models import Genero
+from app.modules.autores.models import Autor
+from app.modules.libros.models import Libro, LibroAutor
+from app.modules.clientes.models import Cliente, PerfilCliente
+from app.modules.ventas.models import Venta, RenglonVenta
 
-__all__ = []
+__all__ = [
+    "Editorial",
+    "Genero",
+    "Autor",
+    "Libro",
+    "LibroAutor",
+    "Cliente",
+    "PerfilCliente",
+    "Venta",
+    "RenglonVenta",
+]
