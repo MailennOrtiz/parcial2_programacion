@@ -1,5 +1,7 @@
 """Pruebas HTTP con SQLite aislado; no sustituyen la prueba en PostgreSQL."""
+import asyncio
 import unittest
+from unittest.mock import AsyncMock, patch
 
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import event
@@ -9,6 +11,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.database import get_session
 from app.main import app
+from app.modules.ventas import avisos
 
 
 class CrudTest(unittest.IsolatedAsyncioTestCase):
@@ -114,3 +117,59 @@ class CrudTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.cliente.post("/ventas/", json={"cliente_id": 999,
             "renglones": [{"libro_id": libro["id"], "cantidad": 1}]})).status_code, 409)
         self.assertEqual((await self.cliente.get("/ventas/")).json(), [])
+
+    async def test_aviso_de_venta_despues_de_la_respuesta_y_sin_bloqueo(self):
+        editorial = await self.alta("/editoriales/", {"nombre": "Sur"})
+        libro = await self.alta("/libros/", {
+            "isbn": "123", "titulo": "Rayuela", "precio": "25.00",
+            "stock": 3, "editorial_id": editorial["id"], "autores": [],
+        })
+        cliente = await self.alta("/clientes/", {"nombre": "Ana", "email": "ana@example.com"})
+        cuerpo = {"cliente_id": cliente["id"], "renglones": [{"libro_id": libro["id"], "cantidad": 1}]}
+
+        respuesta_enviada = asyncio.Event()
+        espera_iniciada = asyncio.Event()
+        terminar_espera = asyncio.Event()
+
+        async def observar_respuesta(scope, receive, send):
+            async def observar_mensaje(mensaje):
+                await send(mensaje)
+                if mensaje["type"] == "http.response.body" and not mensaje.get("more_body"):
+                    respuesta_enviada.set()
+
+            await app(scope, receive, observar_mensaje)
+
+        async def esperar(segundos):
+            self.assertEqual(segundos, 0.5)
+            self.assertTrue(respuesta_enviada.is_set())
+            espera_iniciada.set()
+            await terminar_espera.wait()
+
+        async with AsyncClient(
+            transport=ASGITransport(app=observar_respuesta), base_url="http://test"
+        ) as cliente_venta:
+            with patch.object(avisos, "asyncio") as simulacion, self.assertLogs(avisos.logger, "INFO") as logs:
+                simulacion.sleep = AsyncMock(side_effect=esperar)
+                async with asyncio.TaskGroup() as grupo:
+                    alta = grupo.create_task(cliente_venta.post("/ventas/", json=cuerpo))
+                    try:
+                        await asyncio.wait_for(espera_iniciada.wait(), timeout=3)
+                        salud = await asyncio.wait_for(self.cliente.get("/health/live"), timeout=3)
+                        self.assertEqual(salud.status_code, 200)
+                        self.assertFalse(alta.done())
+                        self.assertEqual(logs.records, [])
+                    finally:
+                        terminar_espera.set()
+
+                respuesta = alta.result()
+                self.assertEqual(respuesta.status_code, 201, respuesta.text)
+                rechazada = await cliente_venta.post("/ventas/", json={
+                    **cuerpo, "renglones": [{"libro_id": 999, "cantidad": 1}],
+                })
+                self.assertEqual(rechazada.status_code, 409)
+                simulacion.sleep.assert_awaited_once_with(0.5)
+
+        self.assertEqual(
+            [registro.getMessage() for registro in logs.records],
+            [f"Comprobante notificado (simulación) para la venta {respuesta.json()['id']}."],
+        )
