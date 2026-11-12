@@ -30,4 +30,5 @@ async def crear_perfil(session, identificador, datos):
     await obtener(session, identificador)
     perfil = PerfilCliente(cliente_id=identificador, **datos.model_dump())
     await crud.guardar(session, perfil)
+    await session.refresh(perfil)
     return perfil

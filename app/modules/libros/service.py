@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload, selectinload, raiseload
 from sqlmodel import select
 from app.core import crud
 from app.modules.libros.models import Libro, LibroAutor
-from app.modules.libros.schemas import LibroRead, AutoriaRead
+from app.modules.libros.schemas import LibroRead, LibroResumenRead, AutoriaRead
 
 def opciones(detalle=False):
     cargas = [joinedload(Libro.editorial), joinedload(Libro.genero), raiseload("*")]
@@ -18,6 +18,11 @@ def lectura(libro):
         precio=libro.precio, stock=libro.stock, editorial=libro.editorial,
         genero=libro.genero, autores=[AutoriaRead.model_validate(a) for a in
             sorted(libro.autorias, key=lambda a: (a.orden, a.autor_id))])
+
+def lectura_resumen(libro):
+    return LibroResumenRead(id=libro.id, isbn=libro.isbn, titulo=libro.titulo,
+        precio=libro.precio, stock=libro.stock, editorial=libro.editorial,
+        genero=libro.genero)
 
 async def obtener(session, identificador):
     consulta = (select(Libro).where(Libro.id == identificador)
@@ -48,4 +53,5 @@ async def listar(session, limit, offset, titulo=None, genero_id=None, editorial_
         consulta = consulta.where(Libro.genero_id == genero_id)
     if editorial_id is not None:
         consulta = consulta.where(Libro.editorial_id == editorial_id)
-    return (await session.exec(consulta.order_by(Libro.id).limit(limit).offset(offset))).all()
+    libros = (await session.exec(consulta.order_by(Libro.id).limit(limit).offset(offset))).all()
+    return [lectura_resumen(l) for l in libros]

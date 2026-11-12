@@ -5,6 +5,7 @@ from sqlmodel import select
 from app.core import crud
 from app.modules.autores.models import Autor
 from app.modules.libros.models import Libro, LibroAutor
+from app.modules.libros.schemas import LibroResumenRead, LibroDeAutorRead
 
 async def crear(session, datos):
     objeto = Autor.model_validate(datos)
@@ -23,4 +24,9 @@ async def libros(session, identificador, limit, offset):
         .options(joinedload(LibroAutor.libro).joinedload(Libro.editorial),
                  joinedload(LibroAutor.libro).joinedload(Libro.genero), raiseload("*"))
         .order_by(LibroAutor.orden, LibroAutor.libro_id).limit(limit).offset(offset))
-    return (await session.exec(consulta)).all()
+    autorias = (await session.exec(consulta)).all()
+    return [LibroDeAutorRead(
+        libro=LibroResumenRead(id=a.libro.id, isbn=a.libro.isbn, titulo=a.libro.titulo,
+            precio=a.libro.precio, stock=a.libro.stock, editorial=a.libro.editorial,
+            genero=a.libro.genero),
+        rol=a.rol, orden=a.orden) for a in autorias]

@@ -1,0 +1,61 @@
+# Guía C-07: lecturas sin N+1
+# Para ver las consultas SQL ejecutadas, inicie la app con SQL_ECHO=true
+# (variable de entorno o SQL_ECHO=1 en .env) y revise la consola del servidor.
+# El número de SELECT no debe crecer al pasar de 1 a N autores/renglones.
+
+@base = http://127.0.0.1:8000
+
+### Alta de editorial
+# @name editorial
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{"nombre": "Editorial Sur"}
+
+### Alta de género
+# @name genero
+POST {{base}}/generos/
+Content-Type: application/json
+
+{"nombre": "Novela"}
+
+### Alta de autor (caso 1 autor)
+# @name autor1
+POST {{base}}/autores/
+Content-Type: application/json
+
+{"nombre": "Autor Uno"}
+
+### Alta de libro con 1 autor
+# @name libro1
+POST {{base}}/libros/
+Content-Type: application/json
+
+{"isbn": "1", "titulo": "Libro Uno", "precio": "25.00", "stock": 3, "editorial_id": {{editorial.response.body.$.id}}, "genero_id": {{genero.response.body.$.id}}, "autores": [{"autor_id": {{autor1.response.body.$.id}}, "rol": "autor", "orden": 1}]}
+
+### C-07: detalle de libro con 1 autor (contar SELECT en consola)
+GET {{base}}/libros/{{libro1.response.body.$.id}}
+
+### Alta de cliente
+# @name cliente
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{"nombre": "Ana", "email": "ana@example.com"}
+
+### Alta de libro para venta
+# @name libroVenta
+POST {{base}}/libros/
+Content-Type: application/json
+
+{"isbn": "V1", "titulo": "Rayuela", "precio": "25.00", "stock": 3, "editorial_id": {{editorial.response.body.$.id}}, "autores": []}
+
+### C-07: venta con 1 renglón
+# @name venta1
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{"cliente_id": {{cliente.response.body.$.id}}, "renglones": [{"libro_id": {{libroVenta.response.body.$.id}}, "cantidad": 2}]}
+
+### C-07: detalle de venta con 1 renglón (contar SELECT en consola)
+GET {{base}}/ventas/{{venta1.response.body.$.id}}
