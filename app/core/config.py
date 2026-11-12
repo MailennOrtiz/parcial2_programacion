@@ -34,3 +34,10 @@ def obtener_sql_echo() -> bool:
     load_dotenv(RUTA_ENV, override=False)
     valor = os.getenv("SQL_ECHO", "false").strip().lower()
     return valor in {"1", "true", "yes", "si", "on"}
+
+
+def obtener_cors_origins() -> list[str]:
+    """Lee orígenes separados por comas; por defecto no habilita ninguno."""
+    load_dotenv(RUTA_ENV, override=False)
+    valor = os.getenv("CORS_ORIGINS", "")
+    return [origen.strip() for origen in valor.split(",") if origen.strip()]

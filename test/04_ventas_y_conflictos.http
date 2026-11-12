@@ -1,0 +1,73 @@
+# Ejecutar únicamente contra una base de prueba dedicada: crea datos reales.
+# Las referencias @name requieren REST Client para VS Code.
+@base = http://127.0.0.1:8000
+
+### 201: editorial de prueba
+# @name editorialCaso
+POST {{base}}/editoriales/
+Content-Type: application/json
+
+{"nombre":"Editorial prueba C04"}
+
+### 201: primer libro
+# @name libroCaso1
+POST {{base}}/libros/
+Content-Type: application/json
+
+{"isbn":"CASO-C06-1","titulo":"Primer libro","precio":"25000.00","stock":10,"editorial_id":{{editorialCaso.response.body.$.id}},"autores":[]}
+
+### 201: segundo libro
+# @name libroCaso2
+POST {{base}}/libros/
+Content-Type: application/json
+
+{"isbn":"CASO-C06-2","titulo":"Segundo libro","precio":"27000.00","stock":10,"editorial_id":{{editorialCaso.response.body.$.id}},"autores":[]}
+
+### 201: cliente
+# @name clienteCaso
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{"nombre":"Cliente de prueba","email":"cliente-c06@example.com"}
+
+### C-02: 409 por email duplicado, con mensaje propio
+POST {{base}}/clientes/
+Content-Type: application/json
+
+{"nombre":"Otro cliente","email":"cliente-c06@example.com"}
+
+### C-03: 201 primer perfil
+POST {{base}}/clientes/{{clienteCaso.response.body.$.id}}/perfil
+Content-Type: application/json
+
+{"telefono":"123456","direccion":"Calle de prueba"}
+
+### C-03: 409 segundo perfil
+POST {{base}}/clientes/{{clienteCaso.response.body.$.id}}/perfil
+Content-Type: application/json
+
+{"telefono":"999999","direccion":"Otra calle"}
+
+### C-04: 409 editorial inexistente; cambiar el ID si llegara a existir
+POST {{base}}/libros/
+Content-Type: application/json
+
+{"isbn":"CASO-C04","titulo":"Libro inválido","precio":"10.00","stock":1,"editorial_id":2147483647,"autores":[]}
+
+### C-05: 409 libro inexistente
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{"cliente_id":{{clienteCaso.response.body.$.id}},"renglones":[{"libro_id":2147483647,"cantidad":1}]}
+
+### C-05: 409 cliente inexistente
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{"cliente_id":2147483647,"renglones":[{"libro_id":{{libroCaso1.response.body.$.id}},"cantidad":1}]}
+
+### C-06: 201; precios 25000.00 y 27000.00, total 77000.00
+POST {{base}}/ventas/
+Content-Type: application/json
+
+{"cliente_id":{{clienteCaso.response.body.$.id}},"renglones":[{"libro_id":{{libroCaso1.response.body.$.id}},"cantidad":2},{"libro_id":{{libroCaso2.response.body.$.id}},"cantidad":1}]}

@@ -4,10 +4,11 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import SQLModel
 
 import app.core.modelos  # Registra las tablas antes de crear el esquema.
-from app.core.config import obtener_database_url, obtener_sql_echo
+from app.core.config import obtener_cors_origins, obtener_database_url, obtener_sql_echo
 from app.core.database import crear_fabrica_de_sesiones, crear_motor
 from app.modules.health.router import router as health_router
 from app.modules.editoriales.router import router as editoriales_router
@@ -32,6 +33,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Librería", version="0.1.0", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=obtener_cors_origins(),
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PATCH"],
+    allow_headers=["Content-Type"],
+)
 app.include_router(health_router)
 app.include_router(editoriales_router)
 app.include_router(generos_router)

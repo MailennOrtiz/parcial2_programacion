@@ -1,5 +1,62 @@
 # Construcción y ejecución de la imagen
 
+## Despliegue rápido en EasyPanel
+
+**Importante para el parcial:** EasyPanel administra los contenedores con su
+propio mecanismo. La consigna solicita explícitamente `docker build` y `docker
+run` en el VPS, además de evidencia de esos comandos. Confirmar con la cátedra
+si acepta EasyPanel como alternativa; de lo contrario usar el procedimiento
+manual de abajo para la entrega. No afirmar que EasyPanel equivale a `docker run`.
+
+1. Crear un servicio **App** en el proyecto de EasyPanel. En **Source**, conectar
+   el repositorio y la rama que contengan estos cambios, o subir el código.
+2. En **Build**, elegir **Dockerfile** con ruta `Dockerfile` y contexto en la
+   raíz del proyecto. No seleccionar un builder automático que ignore el archivo.
+3. En **Environment**, configurar `DATABASE_URL` y `SQL_ECHO=false`. La URL debe
+   usar `postgresql+asyncpg` y los datos de PostgreSQL suministrados. No publicar
+   credenciales en Git, logs ni documentación. Si la contraseña tiene caracteres
+   especiales, codificarlos para URL.
+   Para acceder desde un frontend en otro origen, agregar `CORS_ORIGINS` con sus
+   URLs separadas por comas, por ejemplo
+   `https://frontend.ejemplo.com,http://localhost:5173`. Sin ruta ni barra final;
+   protocolo, dominio y puerto deben coincidir con el frontend. Dejar vacía la
+   variable no habilita ningún origen cruzado. Redesplegar después de cambiarla.
+4. En **Domains**, configurar el dominio público con destino HTTP al **puerto
+   interno 8000**. Habilitar HTTPS según la configuración del panel. No publicar
+   el puerto de PostgreSQL.
+5. Guardar y pulsar **Deploy**. Revisar los logs de construcción y arranque. La
+   aplicación crea las tablas faltantes; si no llega a la base, el arranque falla.
+6. Desde la terminal del contenedor de la aplicación ejecutar, solo cuando la
+   base del parcial esté vacía y no haya escrituras concurrentes:
+
+   ```bash
+   python -m app.datos_iniciales
+   ```
+
+   El comando no borra datos y rechaza tablas del dominio con filas existentes.
+   Anotar los identificadores de cliente y libros que muestra al terminar: se
+   necesitan para probar una venta y pueden no ser 1 y 2.
+   Si no hay terminal en la interfaz, acceder por SSH y usar `docker exec` sobre
+   el contenedor real de la aplicación, cuyo nombre se identifica con `docker ps`.
+7. Desde fuera del VPS comprobar `https://<dominio>/health/ready` y
+   `https://<dominio>/libros/`; consultar también `/docs`. Registrar URL, fecha,
+   hora, configuración y resultados reales en este documento y en `evidencia/`.
+   En `/docs`, usar `POST /ventas/` con los identificadores mostrados por la
+   carga, por ejemplo (reemplazar los números por los valores reales):
+
+   ```json
+   {"cliente_id": 1, "renglones": [{"libro_id": 1, "cantidad": 2}, {"libro_id": 2, "cantidad": 1}]}
+   ```
+
+   Para los precios iniciales y esas cantidades, el total esperado es
+   `77000.00`. La venta crea datos reales en la base; no repetirla sin querer.
+
+Dentro de un contenedor, `localhost` apunta a ese contenedor, no al VPS ni a otra
+base. Usar la dirección interna que provea el servicio de PostgreSQL o la que
+entregue la cátedra; comprobar que sea accesible desde la aplicación. La opción
+`--add-host` indicada más abajo corresponde a `docker run` manual y no se debe
+suponer que EasyPanel la agrega automáticamente.
+
 ## Construcción
 
 Desde la raíz del repositorio, donde está el Dockerfile:
@@ -63,4 +120,6 @@ el `201 Created` de la venta 1 antes del aviso simulado del comprobante.
 
 ## Evidencia del VPS
 
-Pendiente del ejercicio 8.
+Pendiente del ejercicio 8: completar con URL pública, fecha y hora, comandos o
+configuración realmente utilizados, cambios necesarios y procedimiento de
+actualización. No hay evidencia del VPS generada por esta revisión.
