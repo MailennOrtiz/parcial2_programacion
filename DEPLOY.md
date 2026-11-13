@@ -123,3 +123,5 @@ el `201 Created` de la venta 1 antes del aviso simulado del comprobante.
 Pendiente del ejercicio 8: completar con URL pública, fecha y hora, comandos o
 configuración realmente utilizados, cambios necesarios y procedimiento de
 actualización. No hay evidencia del VPS generada por esta revisión.
+<img width="632" height="359" alt="image" src="https://github.com/user-attachments/assets/15a87e43-57b1-47e6-b41d-5dbc7556158c" />
+
