@@ -15,6 +15,13 @@ async def obtener(session, identificador):
         raise HTTPException(status_code=404, detail="Cliente no encontrado.")
     return cliente
 
+async def listar(session, limit, offset):
+    consulta = (select(Cliente)
+        .options(joinedload(Cliente.perfil), raiseload("*"))
+        .order_by(Cliente.id)
+        .limit(limit).offset(offset))
+    return (await session.exec(consulta)).all()
+
 async def crear(session, datos):
     cliente = Cliente.model_validate(datos)
     await crud.guardar(session, cliente)

@@ -66,9 +66,9 @@ envoltorio con `items` o `total`.
 | GET | `/ventas/?limit=20&offset=0` | Listar ventas. |
 | GET | `/ventas/{id}` | Ver venta con cliente y renglones. |
 
-No están implementados los listados `GET /autores/` ni `GET /clientes/`,
-operaciones DELETE, modificación de ventas, ni edición de las autorías desde
-`PATCH /libros/{id}`. El filtro de título es parcial y no distingue mayúsculas.
+No están implementadas operaciones DELETE, modificación de ventas, ni edición
+de las autorías desde `PATCH /libros/{id}`. El filtro de título es parcial y no
+distingue mayúsculas.
 
 ## Cuerpos de creación y actualización
 

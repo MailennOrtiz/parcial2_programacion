@@ -1,13 +1,13 @@
 # Ejecutar únicamente contra una base de prueba dedicada: crea datos reales.
 # Las referencias @name requieren REST Client para VS Code.
-@base = http://127.0.0.1:8000
+@base = http://127.0.0.1:8001
 
 ### 201: editorial de prueba
 # @name editorialCaso
 POST {{base}}/editoriales/
 Content-Type: application/json
 
-{"nombre":"Editorial prueba C04"}
+{"nombre":"Editorial prueba C04 v3"}
 
 ### 201: primer libro
 # @name libroCaso1

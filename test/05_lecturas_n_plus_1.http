@@ -3,7 +3,7 @@
 # (variable de entorno o SQL_ECHO=1 en .env) y revise la consola del servidor.
 # El número de SELECT no debe crecer al pasar de 1 a N autores/renglones.
 
-@base = http://127.0.0.1:8000
+@base = http://127.0.0.1:8001
 
 ### Alta de editorial
 # @name editorial
