@@ -1,0 +1,7 @@
+D-05 — VPS de Hostinger
+Extracto transcrito de la consola del host.
+
+$ docker run --rm --network none easypanel/app_grupo1/libreria_backend:latest; echo "Codigo de salida: $?"
+RuntimeError: Falta DATABASE_URL. Copiá env.example a .env y configurá la base.
+ERROR:    Application startup failed. Exiting.
+Codigo de salida: 3

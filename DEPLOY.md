@@ -120,10 +120,11 @@ el `201 Created` de la venta 1 antes del aviso simulado del comprobante.
 
 ## Evidencia del VPS
 
-URL declarada:https://app-grupo1-libreria-backend.ldb9fn.easypanel.host/docs#/
-<img width="632" height="359" alt="image" src="https://github.com/user-attachments/assets/15a87e43-57b1-47e6-b41d-5dbc7556158c" />
-Cambios utilizados:
-.Cambio de puerto=80-->8000
-.Cambio del URL para la base de datos:DATABASE_URL=postgresql+asyncpg://postgre:t8arj60s0h2fldjp78r8@app_grupo1_libreria_db:5432/libreria_db1
-.Se agrego una linea debajo de la SQL_ECHO=false
+- **URL pública** [Swagger de la librería](https://app-grupo1-libreria-backend.ldb9fn.easypanel.host/docs).
+- **Despliegue exitoso** 12 de noviembre de 2026 a las 20:48:34 (Argentina, UTC−03:00), según el historial de EasyPanel.
+- **Servicios** `libreria_backend` en el puerto interno 8000 y PostgreSQL en `libreria_db`. La conexión se configura mediante `DATABASE_URL` en el entorno del servicio.
+- **Pruebas públicas** `GET /health/ready` y `GET /libros/` devolvieron 200. `POST /ventas/` devolvió 201 para la venta 2, por 5000.00. El aviso simulado quedó registrado después del 201.
+- **Persistencia** EasyPanel reemplazó el contenedor `c814a3e16731` por `059a5713b5db`. El contenedor nuevo quedó `healthy` y `GET /ventas/2` siguió devolviendo 200 con la misma venta.
+- **Arranque aislado y usuario** En el VPS, `docker run` sin `DATABASE_URL` terminó con código 3. El proceso principal del backend corrió con UID 100.
 
+Ver el [índice de evidencias](evidencia/README.md).

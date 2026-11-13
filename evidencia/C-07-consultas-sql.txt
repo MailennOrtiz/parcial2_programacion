@@ -1,0 +1,13 @@
+C-07: ejecucion local de test/test_n_plus_1.py con SQLite en memoria.
+Se agrego una impresion temporal a la prueba para mostrar ambos conteos.
+
+test_libro_detalle_consultas_fijas SELECT con 1 y 5: 2 2
+test_venta_detalle_consultas_fijas SELECT con 1 y 5: 2 2
+test_libro_detalle_consultas_fijas (__main__.NPlusOneTest.test_libro_detalle_consultas_fijas) ... Executing <Task pending name='Task-1' coro=<NPlusOneTest.asyncSetUp() running at <string>:24> wait_for=<Future pending cb=[Task.task_wakeup()] created at C:\Python314\Lib\asyncio\base_events.py:460> cb=[_run_until_complete_cb() at C:\Python314\Lib\asyncio\base_events.py:181] created at C:\Python314\Lib\asyncio\runners.py:110> took 0.133 seconds
+ok
+test_venta_detalle_consultas_fijas (__main__.NPlusOneTest.test_venta_detalle_consultas_fijas) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 3.228s
+
+OK
