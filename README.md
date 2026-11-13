@@ -2,8 +2,7 @@
 
 API asincrónica de catálogo y ventas con FastAPI, SQLModel y PostgreSQL.
 
-**Integrantes:** completar con nombres y apellidos del grupo antes de la entrega.
-
+**Integrantes:** Gabriel D'Anna, Leonel Fachinelli, Mailen Ortiz, Roman Avila, Gonzalo Sanchez y MAximiliano Mendez
 ## Puesta en marcha local
 
 Requiere Python 3.12 o superior y PostgreSQL 16 o superior. Crear previamente
