@@ -2,6 +2,7 @@
 
 API asincrónica de catálogo y ventas con FastAPI, SQLModel y PostgreSQL.
 
+**Grupo:** Los Papuvangers y el Galo
 **Integrantes:** Gabriel D'Anna, Leonel Fachinelli, Mailen Ortiz, Roman Avila, Gonzalo Sanchez y MAximiliano Mendez
 ## Puesta en marcha local
 
