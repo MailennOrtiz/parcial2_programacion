@@ -1,0 +1,23 @@
+VPS Hostinger — 13/11/2026, 16:31–16:34 UTC
+Extracto transcrito de la consola. Código fuente: commit publicado d9466ae.
+Prueba en una red Docker interna con PostgreSQL 18 dedicado y sin puerto público.
+
+D-02
+docker build -t libreria-prueba-d02-d04:d9466ae /root/libreria-d02-d04.clw89p/src
+El clon creado con umask 077 requirió chmod -R a+rX sobre src/app para que el usuario no root pudiera importar el código. El build posterior terminó correctamente.
+docker run -d --name libreria-d0204-api --network libreria-d0204-net --env-file /root/libreria-d02-d04.clw89p/libreria.env libreria-prueba-d02-d04:d9466ae
+Contenedor 7205f34caa05: healthy
+INFO: Application startup complete.
+
+D-03 (peticiones desde el contenedor en el VPS)
+docker exec libreria-d0204-api python -m app.datos_iniciales
+Datos iniciales cargados. Cliente: 1; libros: [1, 2].
+GET /health/ready: 200; base de datos disponible.
+GET /libros/: 200; Rayuela (25000.00) y Respiración artificial (27000.00).
+POST /ventas/: 201; venta 1; 2 × 25000.00 + 1 × 27000.00 = 77000.00.
+
+D-04
+Se guardó la respuesta de GET /ventas/1; se ejecutó docker rm -f libreria-d0204-api y se repitió el mismo docker run.
+Contenedor nuevo 9b45081cd6c3: healthy.
+La respuesta de GET /ventas/1 fue idéntica byte a byte a la anterior (cmp).
+Se detuvieron los contenedores de prueba. El backend público siguió healthy.

@@ -128,3 +128,13 @@ el `201 Created` de la venta 1 antes del aviso simulado del comprobante.
 - **Arranque aislado y usuario** En el VPS, `docker run` sin `DATABASE_URL` terminó con código 3. El proceso principal del backend corrió con UID 100.
 
 Ver el [índice de evidencias](evidencia/README.md).
+
+### Reproducción manual del ejercicio 8
+
+El despliegue público y el reemplazo documentados arriba se hicieron con EasyPanel. La prueba D-05 sí se ejecutó con `docker run` desde el host. Para reproducir D-02 a D-04 con los comandos de la consigna, usar una instancia con una base PostgreSQL vacía dedicada y una configuración privada accesible desde la red de Docker. Conservar los datos del servicio público.
+
+Ejecutar el build y el `docker run` de las secciones anteriores con el puerto y el archivo de variables asignados. Cuando el contenedor esté saludable, cargar los datos con `docker exec libreria python -m app.datos_iniciales` y usar los IDs que devuelve. Desde fuera del VPS, guardar los HTTP 200 de readiness y catálogo y el HTTP 201 de la venta de dos renglones (dos ejemplares de Rayuela y uno de Respiración artificial, total esperado 77000.00).
+
+Guardar el ID del contenedor y la respuesta de la consulta de la venta. Eliminar únicamente el contenedor de la API con `docker rm -f libreria`, repetir exactamente el mismo `docker run` y volver a consultar la misma venta cuando el nuevo contenedor esté saludable. Guardar ambos IDs y ambas respuestas. La base y sus datos deben mantenerse durante el reemplazo.
+
+El 13 de noviembre se reprodujeron D-02 a D-04 en el VPS con el commit publicado `d9466ae`, una red Docker interna y PostgreSQL 18 de prueba. Se construyó la imagen, se cargaron los datos con `docker exec` y se obtuvo un 201 con dos renglones y total `77000.00`. La respuesta de la venta fue idéntica tras recrear el contenedor. Las peticiones de esta ejecución se hicieron dentro del VPS. La comprobación pública previa de EasyPanel corresponde a la venta de un renglón. Ver [registro de la prueba aislada](evidencia/D-02-D-04-docker-vps-aislado.txt).

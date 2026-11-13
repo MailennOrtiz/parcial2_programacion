@@ -1,7 +1,7 @@
 # library-crud Specification
 
 ## Purpose
-TBD - created by archiving change ejercicio-3-contratos-crud. Update Purpose after archive.
+Definir los contratos y operaciones HTTP del catálogo, clientes y ventas, incluida la lectura de relaciones y el manejo de errores.
 
 ## Requirements
 
@@ -38,7 +38,7 @@ El sistema SHALL paginar todos los listados con `limit` entre 1 y 100, por defec
 - **THEN** el texto se trata como dato y no como parte de la consulta SQL
 
 ### Requirement: Lecturas relacionadas
-El sistema SHALL precargar con carga anticipada, en la misma consulta, toda relación que se incluya en una respuesta: `joinedload` para relaciones a uno y `selectinload` para colecciones. Ninguna lectura SHALL depender de carga perezosa. Toda consulta que alimente una respuesta con relaciones SHALL incluir `raiseload("*")` como guardia para detectar accesos perezosos. El detalle de un libro (editorial, género y autores) y el detalle de una venta (cliente y renglones, con libro por renglón) se resolverán con un número fijo de consultas que no crezca con la cantidad de autores o renglones.
+El sistema SHALL precargar todas las relaciones de una respuesta con `joinedload` para relaciones a uno y `selectinload` para colecciones. Las consultas SHALL incluir `raiseload("*")` cuando devuelvan relaciones. El detalle de libro o venta SHALL mantener un número fijo de consultas al aumentar los autores o renglones.
 
 #### Scenario: Detalle relacionado
 - **WHEN** se solicita un detalle con relaciones

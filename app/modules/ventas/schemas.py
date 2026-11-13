@@ -8,11 +8,11 @@ from app.core.schemas import Entrada, Lectura
 from app.modules.clientes.schemas import ClienteResumenRead
 
 class RenglonCreate(Entrada):
-    libro_id: int = Field(gt=0)
-    cantidad: int = Field(gt=0)
+    libro_id: int = Field(gt=0, le=2_147_483_647)
+    cantidad: int = Field(gt=0, le=2_147_483_647)
 
 class VentaCreate(Entrada):
-    cliente_id: int = Field(gt=0)
+    cliente_id: int = Field(gt=0, le=2_147_483_647)
     renglones: list[RenglonCreate] = Field(min_length=1)
 
     @field_validator("renglones")

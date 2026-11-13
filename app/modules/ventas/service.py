@@ -44,6 +44,9 @@ async def crear(session, datos):
     renglones = [RenglonVenta(libro_id=r.libro_id, cantidad=r.cantidad,
         precio_unitario=precios[r.libro_id]) for r in datos.renglones]
     total = sum((r.precio_unitario * r.cantidad for r in renglones), Decimal("0.00"))
+    # NUMERIC(12, 2) admite hasta diez cifras enteras.
+    if total > Decimal("9999999999.99"):
+        raise HTTPException(status_code=422, detail="El total supera el máximo permitido.")
     venta = Venta(cliente_id=datos.cliente_id, fecha=datetime.now(timezone.utc),
         total=total, renglones=renglones)
     await crud.guardar(session, venta)

@@ -24,9 +24,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     motor = crear_motor(obtener_database_url(), obtener_sql_echo())
     app.state.motor = motor
     app.state.fabrica_de_sesiones = crear_fabrica_de_sesiones(motor)
-    async with motor.begin() as conexion:
-        await conexion.run_sync(SQLModel.metadata.create_all)
     try:
+        async with motor.begin() as conexion:
+            await conexion.run_sync(SQLModel.metadata.create_all)
         yield
     finally:
         await motor.dispose()

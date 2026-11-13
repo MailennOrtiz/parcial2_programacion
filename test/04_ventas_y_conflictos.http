@@ -1,6 +1,6 @@
 # Ejecutar únicamente contra una base de prueba dedicada: crea datos reales.
 # Las referencias @name requieren REST Client para VS Code.
-@base = http://127.0.0.1:8001
+@base = http://127.0.0.1:8000
 
 ### 201: editorial de prueba
 # @name editorialCaso

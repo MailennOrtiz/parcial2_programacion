@@ -1,6 +1,6 @@
 # Evidencias del parcial
 
-Ver [datos del despliegue](../DEPLOY.md#evidencia-del-vps). D-02 y D-04 se realizaron con EasyPanel.
+Ver [datos del despliegue](../DEPLOY.md#evidencia-del-vps). Las capturas de EasyPanel corresponden al servicio público. El [registro de D-02 a D-04 con Docker en el VPS](D-02-D-04-docker-vps-aislado.txt) corresponde a la instancia aislada.
 
 | Caso | Evidencia |
 | --- | --- |
