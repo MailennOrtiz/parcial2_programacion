@@ -16,6 +16,10 @@ router = APIRouter(prefix="/clientes", tags=["Clientes"])
 async def crear(datos: ClienteCreate, session: Sesion):
     return await service.crear(session, datos)
 
+@router.get("/", response_model=list[ClienteRead])
+async def listar(session: Sesion, limit: Limite = 20, offset: Desplazamiento = 0):
+    return await service.listar(session, limit, offset)
+
 @router.get("/{cliente_id}", response_model=ClienteRead)
 async def obtener(cliente_id: int, session: Sesion):
     return await service.obtener(session, cliente_id)

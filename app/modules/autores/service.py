@@ -15,6 +15,9 @@ async def crear(session, datos):
 async def obtener(session, identificador):
     return await crud.obtener(session, Autor, identificador)
 
+async def listar(session, limit, offset):
+    return await crud.listar(session, Autor, limit, offset)
+
 async def actualizar(session, identificador, datos):
     return await crud.actualizar(session, Autor, identificador, datos)
 
